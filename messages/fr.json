@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "buy": "Acheter",
+    "rent": "Louer",
+    "new": "Nouveautés",
+    "sell": "Vendre",
+    "login": "Se connecter",
+    "signup": "S'inscrire",
+    "favorites": "Favoris",
+    "myListings": "Mes annonces",
+    "alerts": "Alertes",
+    "logout": "Se déconnecter"
+  },
+  "hero": {
+    "title": "Trouvez votre lieu au Luxembourg",
+    "subtitle": "Parcourez des biens sélectionnés avec prix à jour et carte interactive.",
+    "cta": "Explorer les annonces"
+  },
+  "search": {
+    "keyword": "Mot-clé",
+    "location": "Localisation",
+    "type": "Type",
+    "minPrice": "Prix min",
+    "maxPrice": "Prix max",
+    "beds": "Chambres",
+    "baths": "Salles d'eau",
+    "moreFilters": "Plus de filtres",
+    "fewerFilters": "Masquer",
+    "submit": "Rechercher",
+    "types": {
+      "all": "Tous",
+      "apartment": "Appartement",
+      "house": "Maison",
+      "duplex": "Duplex",
+      "penthouse": "Penthouse",
+      "office": "Bureau",
+      "land": "Terrain"
+    }
+  },
+  "listings": {
+    "sectionTitle": "Annonces à la une",
+    "sectionSubtitle": "Des biens luxembourgeois fraîchement sélectionnés.",
+    "price": "{price}",
+    "pricePerMonth": "{price} /mois",
+    "area": "{value} m²",
+    "beds": "{count} ch",
+    "baths": "{count} sd",
+    "seeMore": "Voir l'annonce"
+  },
+  "map": {
+    "title": "Vue carte"
+  },
+  "footer": {
+    "tagline": "LuxNest vous aide à comparer les biens, suivre les prix et contacter des agents de confiance.",
+    "legal": "© {year} LuxNest. Tous droits réservés."
+  }
+}

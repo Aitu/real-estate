@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "buy": "Buy",
+    "rent": "Rent",
+    "new": "New builds",
+    "sell": "Sell",
+    "login": "Log in",
+    "signup": "Sign up",
+    "favorites": "Favorites",
+    "myListings": "My listings",
+    "alerts": "Alerts",
+    "logout": "Log out"
+  },
+  "hero": {
+    "title": "Find your place in Luxembourg",
+    "subtitle": "Search curated listings across the Grand Duchy with live pricing and map discovery.",
+    "cta": "Explore listings"
+  },
+  "search": {
+    "keyword": "Keyword",
+    "location": "Location",
+    "type": "Type",
+    "minPrice": "Min price",
+    "maxPrice": "Max price",
+    "beds": "Bedrooms",
+    "baths": "Bathrooms",
+    "moreFilters": "More filters",
+    "fewerFilters": "Hide filters",
+    "submit": "Search",
+    "types": {
+      "all": "All",
+      "apartment": "Apartment",
+      "house": "House",
+      "duplex": "Duplex",
+      "penthouse": "Penthouse",
+      "office": "Office",
+      "land": "Land"
+    }
+  },
+  "listings": {
+    "sectionTitle": "Highlighted listings",
+    "sectionSubtitle": "Fresh properties hand-picked for Luxembourg buyers and tenants.",
+    "price": "{price}",
+    "pricePerMonth": "{price} /mo",
+    "area": "{value} m²",
+    "beds": "{count} bd",
+    "baths": "{count} ba",
+    "seeMore": "View details"
+  },
+  "map": {
+    "title": "Map view"
+  },
+  "footer": {
+    "tagline": "LuxNest helps you compare properties, follow price trends, and connect with trusted agents.",
+    "legal": "© {year} LuxNest. All rights reserved."
+  }
+}
