@@ -12,6 +12,7 @@ import {
   X
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -54,12 +55,15 @@ export function SiteHeader() {
       .slice(0, 2);
   }, [user]);
 
+  const loginPath = `/${locale}/login`;
+  const signupPath = `/${locale}/signup`;
+
   const authLinks = (
     <div className="hidden items-center gap-2 md:flex">
-      <Link href="/sign-in" className="text-sm font-medium text-slate-600">
+      <Link href={loginPath} className="text-sm font-medium text-slate-600">
         {tNav('login')}
       </Link>
-      <Link href="/sign-up">
+      <Link href={signupPath}>
         <Button size="sm" className="rounded-full px-4 text-sm">
           {tNav('signup')}
         </Button>
@@ -103,7 +107,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2 md:hidden">
           {!user && (
-            <Link href="/sign-in" aria-label={tNav('login')}>
+            <Link href={loginPath} aria-label={tNav('login')}>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <UserRound className="h-4 w-4" aria-hidden="true" />
               </Button>
@@ -122,7 +126,7 @@ export function SiteHeader() {
         </div>
 
         {user ? (
-          <UserDropdown initials={initials} />
+          <UserDropdown initials={initials} locale={locale} />
         ) : (
           authLinks
         )}
@@ -146,13 +150,13 @@ export function SiteHeader() {
             ))}
             <div className="flex items-center gap-3 px-3 pt-2">
               {user ? (
-                <UserDropdown initials={initials} inline />
+                <UserDropdown initials={initials} inline locale={locale} />
               ) : (
                 <>
-                  <Link href="/sign-in" className="text-sm font-medium text-slate-600">
+                  <Link href={loginPath} className="text-sm font-medium text-slate-600">
                     {tNav('login')}
                   </Link>
-                  <Link href="/sign-up" className="ml-auto">
+                  <Link href={signupPath} className="ml-auto">
                     <Button size="sm" className="rounded-full px-4 text-sm">
                       {tNav('signup')}
                     </Button>
@@ -169,10 +173,12 @@ export function SiteHeader() {
 
 function UserDropdown({
   initials,
-  inline = false
+  inline = false,
+  locale
 }: {
   initials: string;
   inline?: boolean;
+  locale: string;
 }) {
   const tNav = useTranslations('navigation');
 
@@ -209,7 +215,13 @@ function UserDropdown({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-rose-600">
-          {tNav('logout')}
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: `/${locale}` })}
+            className="w-full text-left"
+          >
+            {tNav('logout')}
+          </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
