@@ -8,7 +8,7 @@ const EXCLUDED_PREFIXES = ['/api', '/_next', '/static', '/favicon.ico'];
 const EXCLUDED_EXACT = ['/login', '/signup', '/forgot-password', '/reset-password'];
 const PROTECTED_ROUTES = ['/dashboard'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (
@@ -42,6 +42,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
-  runtime: 'nodejs'
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)']
 };
