@@ -711,8 +711,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.listing_features": {
-      "name": "listing_features",
+    "public.property_features": {
+      "name": "property_features",
       "schema": "",
       "columns": {
         "id": {
@@ -754,8 +754,8 @@
         }
       },
       "indexes": {
-        "listing_features_listing_idx": {
-          "name": "listing_features_listing_idx",
+        "property_features_listing_idx": {
+          "name": "property_features_listing_idx",
           "columns": [
             "listing_id"
           ],
@@ -764,9 +764,9 @@
         }
       },
       "foreignKeys": {
-        "listing_features_listing_id_listings_id_fk": {
-          "name": "listing_features_listing_id_listings_id_fk",
-          "tableFrom": "listing_features",
+        "property_features_listing_id_listings_id_fk": {
+          "name": "property_features_listing_id_listings_id_fk",
+          "tableFrom": "property_features",
           "tableTo": "listings",
           "columnsFrom": [
             "listing_id"

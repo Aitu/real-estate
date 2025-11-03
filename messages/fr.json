@@ -47,6 +47,38 @@
     "baths": "{count} sd",
     "seeMore": "Voir l'annonce"
   },
+  "listingDetail": {
+    "price": "{price}",
+    "pricePerMonth": "{price} /mois",
+    "priceLabel": "Prix de vente",
+    "pricePerMonthLabel": "Loyer mensuel",
+    "summary": {
+      "beds": "{count} chambres",
+      "baths": "{count} salles de bain",
+      "area": "{value} m²",
+      "parking": "{count} places de stationnement",
+      "energyClass": "Classe énergétique {value}",
+      "yearBuilt": "Construit en {year}"
+    },
+    "gallery": {
+      "open": "Voir la galerie",
+      "close": "Fermer la galerie",
+      "next": "Photo suivante",
+      "previous": "Photo précédente"
+    },
+    "descriptionHeading": "Description",
+    "descriptionFallback": "Le vendeur n'a pas encore ajouté de description.",
+    "featuresHeading": "Caractéristiques du bien",
+    "featuresEmpty": "Aucune caractéristique supplémentaire n'a été fournie pour cette annonce.",
+    "mapHeading": "Localisation",
+    "mapUnavailable": "Les informations de localisation ne sont pas disponibles pour cette annonce.",
+    "contactHeading": "Contacter le vendeur",
+    "contactEmail": "Email",
+    "contactPhone": "Téléphone",
+    "contactUnavailable": "Non communiqué",
+    "contactCta": "Demander des informations",
+    "contactFallbackName": "Propriétaire de l'annonce"
+  },
   "map": {
     "title": "Vue carte"
   },

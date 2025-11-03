@@ -47,6 +47,38 @@
     "baths": "{count} Bad",
     "seeMore": "Details ansehen"
   },
+  "listingDetail": {
+    "price": "{price}",
+    "pricePerMonth": "{price} /Monat",
+    "priceLabel": "Kaufpreis",
+    "pricePerMonthLabel": "Monatsmiete",
+    "summary": {
+      "beds": "{count} Schlafzimmer",
+      "baths": "{count} Badezimmer",
+      "area": "{value} m²",
+      "parking": "{count} Stellplätze",
+      "energyClass": "Energieklasse {value}",
+      "yearBuilt": "Baujahr {year}"
+    },
+    "gallery": {
+      "open": "Galerie ansehen",
+      "close": "Galerie schließen",
+      "next": "Nächstes Foto",
+      "previous": "Vorheriges Foto"
+    },
+    "descriptionHeading": "Beschreibung",
+    "descriptionFallback": "Der Anbieter hat noch keine Beschreibung hinterlegt.",
+    "featuresHeading": "Ausstattung",
+    "featuresEmpty": "Für dieses Inserat wurden keine zusätzlichen Merkmale angegeben.",
+    "mapHeading": "Lage",
+    "mapUnavailable": "Für dieses Inserat sind keine Standortinformationen verfügbar.",
+    "contactHeading": "Verkäufer kontaktieren",
+    "contactEmail": "E-Mail",
+    "contactPhone": "Telefon",
+    "contactUnavailable": "Nicht verfügbar",
+    "contactCta": "Informationen anfordern",
+    "contactFallbackName": "Ansprechpartner"
+  },
   "map": {
     "title": "Kartenansicht"
   },
