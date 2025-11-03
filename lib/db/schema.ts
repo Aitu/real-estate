@@ -1,9 +1,13 @@
 import {
+  boolean,
+  doublePrecision,
+  index,
   pgTable,
   serial,
-  varchar,
   text,
   timestamp,
+  uniqueIndex,
+  varchar,
   integer,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
@@ -14,10 +18,140 @@ export const users = pgTable('users', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   role: varchar('role', { length: 20 }).notNull().default('member'),
+  locale: varchar('locale', { length: 5 }).default('en'),
+  phoneNumber: varchar('phone_number', { length: 32 }),
+  avatarUrl: text('avatar_url'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),
 });
+
+export const listings = pgTable(
+  'listings',
+  {
+    id: serial('id').primaryKey(),
+    ownerId: integer('owner_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    slug: varchar('slug', { length: 160 }).notNull(),
+    title: varchar('title', { length: 180 }).notNull(),
+    description: text('description'),
+    propertyType: varchar('property_type', { length: 50 }).notNull(),
+    transactionType: varchar('transaction_type', { length: 20 })
+      .notNull()
+      .default('sale'),
+    status: varchar('status', { length: 20 }).notNull().default('draft'),
+    price: integer('price').notNull(),
+    currency: varchar('currency', { length: 3 }).notNull().default('EUR'),
+    bedrooms: integer('bedrooms'),
+    bathrooms: integer('bathrooms'),
+    parkingSpaces: integer('parking_spaces'),
+    area: integer('area'),
+    lotArea: integer('lot_area'),
+    yearBuilt: integer('year_built'),
+    energyClass: varchar('energy_class', { length: 5 }),
+    floor: integer('floor'),
+    totalFloors: integer('total_floors'),
+    street: varchar('street', { length: 180 }),
+    city: varchar('city', { length: 100 }).notNull(),
+    postalCode: varchar('postal_code', { length: 12 }).notNull(),
+    country: varchar('country', { length: 2 }).notNull().default('LU'),
+    latitude: doublePrecision('latitude'),
+    longitude: doublePrecision('longitude'),
+    publishedAt: timestamp('published_at'),
+    expiresAt: timestamp('expires_at'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => ({
+    ownerIdx: index('listings_owner_idx').on(table.ownerId),
+    cityIdx: index('listings_city_idx').on(table.city),
+    statusIdx: index('listings_status_idx').on(table.status),
+    slugUnique: uniqueIndex('listings_slug_unique').on(table.slug),
+  })
+);
+
+export const listingImages = pgTable(
+  'listing_images',
+  {
+    id: serial('id').primaryKey(),
+    listingId: integer('listing_id')
+      .notNull()
+      .references(() => listings.id, { onDelete: 'cascade' }),
+    url: text('url').notNull(),
+    alt: varchar('alt', { length: 180 }),
+    isPrimary: boolean('is_primary').notNull().default(false),
+    displayOrder: integer('display_order').notNull().default(0),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => ({
+    listingIdx: index('listing_images_listing_idx').on(table.listingId),
+  })
+);
+
+export const listingFeatures = pgTable(
+  'listing_features',
+  {
+    id: serial('id').primaryKey(),
+    listingId: integer('listing_id')
+      .notNull()
+      .references(() => listings.id, { onDelete: 'cascade' }),
+    label: varchar('label', { length: 120 }).notNull(),
+    value: varchar('value', { length: 255 }),
+    icon: varchar('icon', { length: 60 }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => ({
+    listingIdx: index('listing_features_listing_idx').on(table.listingId),
+  })
+);
+
+export const favorites = pgTable(
+  'favorites',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    listingId: integer('listing_id')
+      .notNull()
+      .references(() => listings.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => ({
+    userListingUnique: uniqueIndex('favorites_user_listing_unique').on(
+      table.userId,
+      table.listingId
+    ),
+  })
+);
+
+export const alerts = pgTable(
+  'alerts',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    title: varchar('title', { length: 120 }).notNull(),
+    minPrice: integer('min_price'),
+    maxPrice: integer('max_price'),
+    propertyTypes: varchar('property_types', { length: 255 }),
+    transactionType: varchar('transaction_type', { length: 20 }).default('sale'),
+    minBedrooms: integer('min_bedrooms'),
+    maxBedrooms: integer('max_bedrooms'),
+    city: varchar('city', { length: 100 }),
+    postalCodes: varchar('postal_codes', { length: 100 }),
+    radiusKm: integer('radius_km'),
+    frequency: varchar('frequency', { length: 20 }).default('instant'),
+    lastTriggeredAt: timestamp('last_triggered_at'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => ({
+    userIdx: index('alerts_user_idx').on(table.userId),
+  })
+);
 
 export const teams = pgTable('teams', {
   id: serial('id').primaryKey(),
@@ -77,6 +211,54 @@ export const teamsRelations = relations(teams, ({ many }) => ({
 export const usersRelations = relations(users, ({ many }) => ({
   teamMembers: many(teamMembers),
   invitationsSent: many(invitations),
+  listings: many(listings),
+  favorites: many(favorites),
+  alerts: many(alerts),
+}));
+
+export const listingsRelations = relations(listings, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [listings.ownerId],
+    references: [users.id],
+  }),
+  images: many(listingImages),
+  favorites: many(favorites),
+  features: many(listingFeatures),
+}));
+
+export const listingImagesRelations = relations(listingImages, ({ one }) => ({
+  listing: one(listings, {
+    fields: [listingImages.listingId],
+    references: [listings.id],
+  }),
+}));
+
+export const listingFeaturesRelations = relations(
+  listingFeatures,
+  ({ one }) => ({
+    listing: one(listings, {
+      fields: [listingFeatures.listingId],
+      references: [listings.id],
+    }),
+  })
+);
+
+export const favoritesRelations = relations(favorites, ({ one }) => ({
+  listing: one(listings, {
+    fields: [favorites.listingId],
+    references: [listings.id],
+  }),
+  user: one(users, {
+    fields: [favorites.userId],
+    references: [users.id],
+  }),
+}));
+
+export const alertsRelations = relations(alerts, ({ one }) => ({
+  user: one(users, {
+    fields: [alerts.userId],
+    references: [users.id],
+  }),
 }));
 
 export const invitationsRelations = relations(invitations, ({ one }) => ({
@@ -127,6 +309,17 @@ export type TeamDataWithMembers = Team & {
     user: Pick<User, 'id' | 'name' | 'email'>;
   })[];
 };
+
+export type Listing = typeof listings.$inferSelect;
+export type NewListing = typeof listings.$inferInsert;
+export type ListingImage = typeof listingImages.$inferSelect;
+export type NewListingImage = typeof listingImages.$inferInsert;
+export type ListingFeature = typeof listingFeatures.$inferSelect;
+export type NewListingFeature = typeof listingFeatures.$inferInsert;
+export type Favorite = typeof favorites.$inferSelect;
+export type NewFavorite = typeof favorites.$inferInsert;
+export type Alert = typeof alerts.$inferSelect;
+export type NewAlert = typeof alerts.$inferInsert;
 
 export enum ActivityType {
   SIGN_UP = 'SIGN_UP',
