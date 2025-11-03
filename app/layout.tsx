@@ -4,6 +4,7 @@ import { Manrope } from 'next/font/google';
 import { SWRConfig } from 'swr';
 import { ReactNode } from 'react';
 import { getUser, getTeamForUser } from '@/lib/db/queries';
+import { SessionProviders } from '@/components/providers/session-provider';
 
 export const metadata: Metadata = {
   title: {
@@ -37,7 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             }
           }}
         >
-          {children}
+          <SessionProviders>{children}</SessionProviders>
         </SWRConfig>
       </body>
     </html>
