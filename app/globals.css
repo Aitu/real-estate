@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css');
 /*
   ---break---
 */
@@ -67,6 +66,7 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+
   *,
   ::after,
   ::before,
@@ -159,6 +159,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -270,6 +271,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -279,12 +281,15 @@
   0% {
     transform: scale(1);
   }
+
   40% {
     transform: scale(1.25);
   }
+
   70% {
     transform: scale(0.92);
   }
+
   100% {
     transform: scale(1);
   }

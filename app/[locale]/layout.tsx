@@ -15,7 +15,7 @@ export default async function LocaleLayout({
   children: ReactNode;
   params: { locale: string };
 }) {
-  const { locale: requestedLocale } = params;
+  const { locale: requestedLocale } = await params;
 
   if (!isLocale(requestedLocale)) {
     notFound();

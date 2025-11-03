@@ -47,7 +47,7 @@ export default function LoginPage() {
   const callbackUrl = useMemo(() => {
     const from = searchParams?.get('from');
     const callback = searchParams?.get('callbackUrl') ?? searchParams?.get('redirectTo');
-    return callback || from || `/${locale}/dashboard`;
+    return callback || from || `/${locale}/`;
   }, [locale, searchParams]);
 
   const form = useForm<LoginValues>({

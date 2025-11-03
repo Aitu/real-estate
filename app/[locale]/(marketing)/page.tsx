@@ -12,7 +12,7 @@ export default async function LandingPage({
 }: {
   params: { locale: string };
 }) {
-  const { locale } = params;
+  const { locale } = await params;
   if (!isLocale(locale)) {
     notFound();
   }

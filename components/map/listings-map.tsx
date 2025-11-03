@@ -1,15 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import Script from 'next/script';
+import { useEffect, useRef } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import type { ListingSummary } from '@/lib/types/listing';
 import { MAPBOX_PUBLIC_TOKEN } from '@/lib/mapbox';
-
-declare global {
-  interface Window {
-    mapboxgl?: typeof import('mapbox-gl');
-  }
-}
 
 interface ListingsMapProps {
   listings: ListingSummary[];
@@ -17,41 +12,28 @@ interface ListingsMapProps {
 
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
 
+mapboxgl.accessToken = MAPBOX_PUBLIC_TOKEN;
+
 export function ListingsMap({ listings }: ListingsMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null);
-  const [ready, setReady] = useState(false);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
 
   useEffect(() => {
-    if (!ready || !containerRef.current) {
-      return;
-    }
-
-    const mapbox = window.mapboxgl;
-    if (!mapbox) {
-      return;
-    }
-
-    if (mapRef.current) {
-      mapRef.current.remove();
-      mapRef.current = null;
-    }
-
-    mapbox.accessToken = MAPBOX_PUBLIC_TOKEN;
+    if (!containerRef.current) return;
 
     const centerListing = listings[0];
     const defaultCenter = centerListing
       ? [centerListing.location.coordinates.lng, centerListing.location.coordinates.lat]
       : [6.1296, 49.6116];
 
-    const map = new mapbox.Map({
+    const map = new mapboxgl.Map({
       container: containerRef.current,
       style: MAPBOX_STYLE,
-      center: defaultCenter,
+      center: defaultCenter as [number, number],
       zoom: 10.4
     });
 
-    map.addControl(new mapbox.NavigationControl({ visualizePitch: true }), 'top-right');
+    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'top-right');
 
     map.on('load', () => {
       listings.forEach((listing) => {
@@ -60,11 +42,11 @@ export function ListingsMap({ listings }: ListingsMapProps) {
           listing.location.coordinates.lat
         ] as [number, number];
 
-        const popup = new mapbox.Popup({ closeButton: false }).setHTML(
+        const popup = new mapboxgl.Popup({ closeButton: false }).setHTML(
           `<strong>${listing.title}</strong><br/>€${listing.price.toLocaleString('en-US')}`
         );
 
-        new mapbox.Marker({ color: '#0f172a' })
+        new mapboxgl.Marker({ color: '#0f172a' })
           .setLngLat(coordinates)
           .setPopup(popup)
           .addTo(map);
@@ -76,19 +58,12 @@ export function ListingsMap({ listings }: ListingsMapProps) {
     return () => {
       map.remove();
     };
-  }, [listings, ready]);
+  }, [listings]);
 
   return (
-    <div className="relative">
-      <Script
-        src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"
-        strategy="lazyOnload"
-        onReady={() => setReady(true)}
-      />
-      <div
-        ref={containerRef}
-        className="h-[360px] w-full overflow-hidden rounded-3xl border border-slate-200"
-      />
-    </div>
+    <div
+      ref={containerRef}
+      className="h-[360px] w-full overflow-hidden rounded-3xl border border-slate-200"
+    />
   );
 }

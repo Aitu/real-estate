@@ -29,6 +29,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`bg-white text-slate-900 antialiased ${manrope.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <link
+          href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css"
+          rel="stylesheet"
+        />
+      </head>
       <body className="min-h-[100dvh] bg-neutral-50">
         <SWRConfig
           value={{

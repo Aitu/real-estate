@@ -58,6 +58,7 @@ export function ListingCard({ listing, isFavorite, onToggleFavorite }: ListingCa
             className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
             sizes="(min-width: 1024px) 400px, 100vw"
             priority={false}
+            loading='eager'
           />
         </div>
         <button
