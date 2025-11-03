@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS "listing_images" (
   "created_at" timestamp DEFAULT now() NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "listing_features" (
+CREATE TABLE IF NOT EXISTS "property_features" (
   "id" serial PRIMARY KEY NOT NULL,
   "listing_id" integer NOT NULL,
   "label" varchar(120) NOT NULL,
@@ -85,7 +85,7 @@ CREATE INDEX IF NOT EXISTS "listings_owner_idx" ON "listings" ("owner_id");
 CREATE INDEX IF NOT EXISTS "listings_city_idx" ON "listings" ("city");
 CREATE INDEX IF NOT EXISTS "listings_status_idx" ON "listings" ("status");
 CREATE INDEX IF NOT EXISTS "listing_images_listing_idx" ON "listing_images" ("listing_id");
-CREATE INDEX IF NOT EXISTS "listing_features_listing_idx" ON "listing_features" ("listing_id");
+CREATE INDEX IF NOT EXISTS "property_features_listing_idx" ON "property_features" ("listing_id");
 CREATE INDEX IF NOT EXISTS "alerts_user_idx" ON "alerts" ("user_id");
 
 DO $$ BEGIN
@@ -101,7 +101,7 @@ EXCEPTION
 END $$;
 
 DO $$ BEGIN
- ALTER TABLE "listing_features" ADD CONSTRAINT "listing_features_listing_id_listings_id_fk" FOREIGN KEY ("listing_id") REFERENCES "public"."listings"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "property_features" ADD CONSTRAINT "property_features_listing_id_listings_id_fk" FOREIGN KEY ("listing_id") REFERENCES "public"."listings"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

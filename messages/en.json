@@ -47,6 +47,38 @@
     "baths": "{count} ba",
     "seeMore": "View details"
   },
+  "listingDetail": {
+    "price": "{price}",
+    "pricePerMonth": "{price} /mo",
+    "priceLabel": "Listing price",
+    "pricePerMonthLabel": "Monthly rent",
+    "summary": {
+      "beds": "{count} bedrooms",
+      "baths": "{count} bathrooms",
+      "area": "{value} m²",
+      "parking": "{count} parking spaces",
+      "energyClass": "Energy class {value}",
+      "yearBuilt": "Built in {year}"
+    },
+    "gallery": {
+      "open": "View gallery",
+      "close": "Close gallery",
+      "next": "Next photo",
+      "previous": "Previous photo"
+    },
+    "descriptionHeading": "Description",
+    "descriptionFallback": "The seller hasn't shared a description yet.",
+    "featuresHeading": "Property features",
+    "featuresEmpty": "No additional features were provided for this listing.",
+    "mapHeading": "Location",
+    "mapUnavailable": "Location information is not available for this listing.",
+    "contactHeading": "Contact seller",
+    "contactEmail": "Email",
+    "contactPhone": "Phone",
+    "contactUnavailable": "Not provided",
+    "contactCta": "Request information",
+    "contactFallbackName": "Listing owner"
+  },
   "map": {
     "title": "Map view"
   },

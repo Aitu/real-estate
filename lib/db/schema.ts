@@ -89,8 +89,8 @@ export const listingImages = pgTable(
   })
 );
 
-export const listingFeatures = pgTable(
-  'listing_features',
+export const propertyFeatures = pgTable(
+  'property_features',
   {
     id: serial('id').primaryKey(),
     listingId: integer('listing_id')
@@ -102,7 +102,7 @@ export const listingFeatures = pgTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (table) => ({
-    listingIdx: index('listing_features_listing_idx').on(table.listingId),
+    listingIdx: index('property_features_listing_idx').on(table.listingId),
   })
 );
 
@@ -223,7 +223,7 @@ export const listingsRelations = relations(listings, ({ one, many }) => ({
   }),
   images: many(listingImages),
   favorites: many(favorites),
-  features: many(listingFeatures),
+  features: many(propertyFeatures),
 }));
 
 export const listingImagesRelations = relations(listingImages, ({ one }) => ({
@@ -233,11 +233,11 @@ export const listingImagesRelations = relations(listingImages, ({ one }) => ({
   }),
 }));
 
-export const listingFeaturesRelations = relations(
-  listingFeatures,
+export const propertyFeaturesRelations = relations(
+  propertyFeatures,
   ({ one }) => ({
     listing: one(listings, {
-      fields: [listingFeatures.listingId],
+      fields: [propertyFeatures.listingId],
       references: [listings.id],
     }),
   })
@@ -314,8 +314,8 @@ export type Listing = typeof listings.$inferSelect;
 export type NewListing = typeof listings.$inferInsert;
 export type ListingImage = typeof listingImages.$inferSelect;
 export type NewListingImage = typeof listingImages.$inferInsert;
-export type ListingFeature = typeof listingFeatures.$inferSelect;
-export type NewListingFeature = typeof listingFeatures.$inferInsert;
+export type PropertyFeature = typeof propertyFeatures.$inferSelect;
+export type NewPropertyFeature = typeof propertyFeatures.$inferInsert;
 export type Favorite = typeof favorites.$inferSelect;
 export type NewFavorite = typeof favorites.$inferInsert;
 export type Alert = typeof alerts.$inferSelect;
