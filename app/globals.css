@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css');
 /*
   ---break---
 */
@@ -272,4 +273,23 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes heartBurst {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.25);
+  }
+  70% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.heart-burst {
+  animation: heartBurst 0.45s ease;
 }

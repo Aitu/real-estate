@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "buy": "Kaufen",
+    "rent": "Mieten",
+    "new": "Neubauten",
+    "sell": "Verkaufen",
+    "login": "Anmelden",
+    "signup": "Registrieren",
+    "favorites": "Favoriten",
+    "myListings": "Meine Inserate",
+    "alerts": "Benachrichtigungen",
+    "logout": "Abmelden"
+  },
+  "hero": {
+    "title": "Finden Sie Ihr Zuhause in Luxemburg",
+    "subtitle": "Entdecken Sie kuratierte Objekte mit aktuellen Preisen und Kartenansicht.",
+    "cta": "Angebote entdecken"
+  },
+  "search": {
+    "keyword": "Stichwort",
+    "location": "Ort",
+    "type": "Typ",
+    "minPrice": "Min. Preis",
+    "maxPrice": "Max. Preis",
+    "beds": "Schlafzimmer",
+    "baths": "Bäder",
+    "moreFilters": "Weitere Filter",
+    "fewerFilters": "Filter ausblenden",
+    "submit": "Suchen",
+    "types": {
+      "all": "Alle",
+      "apartment": "Wohnung",
+      "house": "Haus",
+      "duplex": "Duplex",
+      "penthouse": "Penthouse",
+      "office": "Büro",
+      "land": "Grundstück"
+    }
+  },
+  "listings": {
+    "sectionTitle": "Ausgewählte Inserate",
+    "sectionSubtitle": "Frisch kuratierte Immobilien für Luxemburg.",
+    "price": "{price}",
+    "pricePerMonth": "{price} /Monat",
+    "area": "{value} m²",
+    "beds": "{count} SZ",
+    "baths": "{count} Bad",
+    "seeMore": "Details ansehen"
+  },
+  "map": {
+    "title": "Kartenansicht"
+  },
+  "footer": {
+    "tagline": "LuxNest unterstützt Sie beim Vergleichen, Beobachten und Kontaktieren von seriösen Maklern.",
+    "legal": "© {year} LuxNest. Alle Rechte vorbehalten."
+  }
+}
