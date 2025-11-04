@@ -111,5 +111,137 @@
   "footer": {
     "tagline": "LuxNest unterstützt Sie beim Vergleichen, Beobachten und Kontaktieren von seriösen Maklern.",
     "legal": "© {year} LuxNest. Alle Rechte vorbehalten."
+  },
+  "myListings": {
+    "heading": {
+      "title": "Meine Inserate",
+      "subtitle": "Verwalten Sie die von Ihnen veröffentlichten Objekte und halten Sie die Daten aktuell."
+    },
+    "createButton": "Neues Inserat",
+    "table": {
+      "headers": {
+        "listing": "Inserat",
+        "status": "Status",
+        "price": "Preis",
+        "updated": "Zuletzt aktualisiert",
+        "actions": "Aktionen"
+      },
+      "actions": {
+        "edit": "Bearbeiten",
+        "deactivate": "Deaktivieren",
+        "deactivatePending": "Deaktivierung…",
+        "confirmDeactivate": "Möchten Sie dieses Inserat wirklich deaktivieren?"
+      },
+      "noResults": "Sie haben noch keine Inserate erstellt."
+    },
+    "pagination": {
+      "previous": "Zurück",
+      "next": "Weiter",
+      "summary": "Zeige {from}–{to} von {total} Inseraten"
+    },
+    "sort": {
+      "label": "Sortieren nach",
+      "options": {
+        "createdDesc": "Neueste zuerst",
+        "createdAsc": "Älteste zuerst",
+        "priceDesc": "Preis: absteigend",
+        "priceAsc": "Preis: aufsteigend"
+      }
+    },
+    "form": {
+      "fields": {
+        "title": {
+          "label": "Titel",
+          "placeholder": "Luxuriöse Stadtwohnung"
+        },
+        "description": {
+          "label": "Beschreibung",
+          "placeholder": "Beschreiben Sie die wichtigsten Highlights des Objekts."
+        },
+        "propertyType": {
+          "label": "Objekttyp",
+          "placeholder": "Wählen Sie einen Objekttyp"
+        },
+        "status": {
+          "label": "Status"
+        },
+        "price": {
+          "label": "Preis",
+          "placeholder": "350000"
+        },
+        "currency": {
+          "label": "Währung",
+          "placeholder": "EUR"
+        },
+        "city": {
+          "label": "Stadt",
+          "placeholder": "Luxemburg"
+        },
+        "postalCode": {
+          "label": "Postleitzahl",
+          "placeholder": "L-1330"
+        },
+        "country": {
+          "label": "Land",
+          "placeholder": "LU"
+        },
+        "street": {
+          "label": "Straße",
+          "placeholder": "Grand-Rue 12"
+        },
+        "bedrooms": {
+          "label": "Schlafzimmer",
+          "placeholder": "3"
+        },
+        "bathrooms": {
+          "label": "Badezimmer",
+          "placeholder": "2"
+        },
+        "area": {
+          "label": "Fläche (m²)",
+          "placeholder": "120"
+        }
+      },
+      "transaction": {
+        "label": "Transaktionstyp",
+        "sale": "Zum Verkauf",
+        "rent": "Zur Miete"
+      },
+      "propertyTypes": {
+        "apartment": "Apartment",
+        "house": "Haus",
+        "duplex": "Duplex",
+        "penthouse": "Penthouse",
+        "office": "Büro",
+        "land": "Grundstück"
+      },
+      "statusHelp": "Entwürfe bleiben privat, bis Sie sie veröffentlichen.",
+      "buttons": {
+        "cancel": "Abbrechen",
+        "create": {
+          "submit": "Inserat erstellen",
+          "submitting": "Wird erstellt…"
+        },
+        "update": {
+          "submit": "Änderungen speichern",
+          "submitting": "Wird gespeichert…"
+        }
+      }
+    },
+    "statuses": {
+      "draft": "Entwurf",
+      "published": "Veröffentlicht",
+      "inactive": "Inaktiv"
+    },
+    "errors": {
+      "create": "Das Inserat konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+      "update": "Das Inserat konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+      "deactivate": "Das Inserat konnte nicht deaktiviert werden. Bitte versuchen Sie es erneut."
+    },
+    "messages": {
+      "createSuccess": "Inserat erfolgreich erstellt.",
+      "updateSuccess": "Inserat erfolgreich aktualisiert.",
+      "deactivateSuccess": "Inserat deaktiviert."
+    }
   }
 }
