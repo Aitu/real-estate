@@ -16,9 +16,15 @@ interface ListingCardProps {
   listing: ListingSummary;
   isFavorite: boolean;
   onToggleFavorite: (listingId: string) => void;
+  isFavoriteDisabled?: boolean;
 }
 
-export function ListingCard({ listing, isFavorite, onToggleFavorite }: ListingCardProps) {
+export function ListingCard({
+  listing,
+  isFavorite,
+  onToggleFavorite,
+  isFavoriteDisabled = false
+}: ListingCardProps) {
   const t = useTranslations('listings');
   const { locale } = useI18n();
   const [animating, setAnimating] = useState(false);
@@ -65,7 +71,12 @@ export function ListingCard({ listing, isFavorite, onToggleFavorite }: ListingCa
           type="button"
           onClick={() => onToggleFavorite(listing.id)}
           aria-pressed={isFavorite}
-          className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-md backdrop-blur transition hover:bg-white"
+          aria-disabled={isFavoriteDisabled}
+          disabled={isFavoriteDisabled}
+          className={cn(
+            'absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-md backdrop-blur transition hover:bg-white',
+            isFavoriteDisabled && 'cursor-not-allowed opacity-70'
+          )}
         >
           <Heart
             className={cn(

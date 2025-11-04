@@ -82,6 +82,32 @@
   "map": {
     "title": "Vue carte"
   },
+  "favorites": {
+    "pageTitle": "Biens enregistrés",
+    "pageSubtitle": "Suivez les biens qui vous intéressent et comparez leurs prix en un coup d'œil.",
+    "authRequiredTitle": "Connectez-vous pour enregistrer des favoris",
+    "authRequiredDescription": "Créez un compte ou connectez-vous pour retrouver vos annonces préférées au même endroit.",
+    "authRequiredCta": "Se connecter",
+    "emptyTitle": "Vous n'avez encore enregistré aucune annonce",
+    "emptyDescription": "Touchez le cœur d'une annonce pour l'ajouter à vos favoris.",
+    "quickFiltersLabel": "Filtres rapides",
+    "trendHeading": "Tendance des prix",
+    "trendDescription": "Prix moyen demandé basé sur vos favoris des six derniers mois.",
+    "trendEmpty": "Ajoutez quelques favoris pour afficher les tendances.",
+    "avgPriceLabel": "Moyenne actuelle",
+    "favoritesCountLabel": "Total enregistré",
+    "favoritesCount": "{count} favoris",
+    "removeError": "Impossible de mettre à jour ce favori. Réessayez.",
+    "filters": {
+      "all": "Tous",
+      "apartment": "Appartements",
+      "house": "Maisons",
+      "duplex": "Duplex",
+      "penthouse": "Penthouses",
+      "office": "Bureaux",
+      "land": "Terrains"
+    }
+  },
   "footer": {
     "tagline": "LuxNest vous aide à comparer les biens, suivre les prix et contacter des agents de confiance.",
     "legal": "© {year} LuxNest. Tous droits réservés."
