@@ -82,6 +82,32 @@
   "map": {
     "title": "Map view"
   },
+  "favorites": {
+    "pageTitle": "Saved homes",
+    "pageSubtitle": "Keep track of the listings you love and monitor price shifts at a glance.",
+    "authRequiredTitle": "Sign in to save favorites",
+    "authRequiredDescription": "Create an account or sign in to collect listings in one place.",
+    "authRequiredCta": "Go to sign in",
+    "emptyTitle": "You haven't saved any listings yet",
+    "emptyDescription": "Tap the heart on a listing to add it to your favorites.",
+    "quickFiltersLabel": "Quick filters",
+    "trendHeading": "Price outlook",
+    "trendDescription": "Average asking price based on your favorites over the past six months.",
+    "trendEmpty": "Add a few favorites to unlock insights.",
+    "avgPriceLabel": "Current average",
+    "favoritesCountLabel": "Saved total",
+    "favoritesCount": "{count} favorites",
+    "removeError": "We couldn't update this favorite. Try again.",
+    "filters": {
+      "all": "All",
+      "apartment": "Apartments",
+      "house": "Houses",
+      "duplex": "Duplexes",
+      "penthouse": "Penthouses",
+      "office": "Offices",
+      "land": "Land"
+    }
+  },
   "footer": {
     "tagline": "LuxNest helps you compare properties, follow price trends, and connect with trusted agents.",
     "legal": "© {year} LuxNest. All rights reserved."

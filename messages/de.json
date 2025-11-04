@@ -82,6 +82,32 @@
   "map": {
     "title": "Kartenansicht"
   },
+  "favorites": {
+    "pageTitle": "Gespeicherte Inserate",
+    "pageSubtitle": "Behalte deine Favoriten im Blick und vergleiche die Preise schnell.",
+    "authRequiredTitle": "Melde dich an, um Favoriten zu speichern",
+    "authRequiredDescription": "Erstelle ein Konto oder melde dich an, um Inserate an einem Ort zu sammeln.",
+    "authRequiredCta": "Zur Anmeldung",
+    "emptyTitle": "Du hast noch keine Inserate gespeichert",
+    "emptyDescription": "Tippe auf das Herz bei einem Inserat, um es zu deinen Favoriten hinzuzufügen.",
+    "quickFiltersLabel": "Schnellfilter",
+    "trendHeading": "Preisverlauf",
+    "trendDescription": "Durchschnittlicher Angebotspreis deiner Favoriten der letzten sechs Monate.",
+    "trendEmpty": "Füge einige Favoriten hinzu, um Einblicke zu sehen.",
+    "avgPriceLabel": "Aktueller Durchschnitt",
+    "favoritesCountLabel": "Gespeichert gesamt",
+    "favoritesCount": "{count} Favoriten",
+    "removeError": "Favorit konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+    "filters": {
+      "all": "Alle",
+      "apartment": "Wohnungen",
+      "house": "Häuser",
+      "duplex": "Duplex",
+      "penthouse": "Penthouses",
+      "office": "Büros",
+      "land": "Grundstücke"
+    }
+  },
   "footer": {
     "tagline": "LuxNest unterstützt Sie beim Vergleichen, Beobachten und Kontaktieren von seriösen Maklern.",
     "legal": "© {year} LuxNest. Alle Rechte vorbehalten."
