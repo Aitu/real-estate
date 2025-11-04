@@ -5,11 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  initialListingFormState,
-  type ListingFormField,
-  type ListingFormState,
-} from './actions';
+import { type ListingFormField, type ListingFormState } from './actions';
 import type { ListingStatus } from '@/lib/types/listing';
 
 export type ListingFormValues = {
@@ -100,6 +96,7 @@ export function ListingForm({
   onSuccess,
   showStatus = true,
 }: ListingFormProps) {
+  const initialListingFormState: ListingFormState = { fields: {} };
   const [state, formAction, pending] = useActionState(action, initialListingFormState);
   const router = useRouter();
 

@@ -33,8 +33,8 @@ export default async function MyListingsPage({
   params,
   searchParams,
 }: {
-  params: { locale: string };
-  searchParams?: Record<string, string | string[]>;
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) {
@@ -43,11 +43,13 @@ export default async function MyListingsPage({
 
   const user = await getUser();
   if (!user) {
-    redirect(`/sign-in?redirect=/${locale}/my-listings`);
+    const callbackUrl = encodeURIComponent(`/${locale}/my-listings`);
+    redirect(`/${locale}/login?callbackUrl=${callbackUrl}`);
   }
 
-  const page = parsePage(searchParams?.page);
-  const sort = parseSort(searchParams?.sort);
+  const resolvedParams = await searchParams;
+  const page = parsePage(resolvedParams?.page);
+  const sort = parseSort(resolvedParams?.sort);
 
   const [messages, listingResult] = await Promise.all([
     loadMessages(locale as Locale),

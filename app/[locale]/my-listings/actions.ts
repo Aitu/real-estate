@@ -92,10 +92,6 @@ export type ListingFormState = ActionState & {
   fields: Partial<Record<ListingFormField, string>>;
 };
 
-export const initialListingFormState: ListingFormState = {
-  fields: {},
-};
-
 function getFieldValues(formData: FormData) {
   const fields: Partial<Record<ListingFormField, string>> = {};
   for (const key of listingFieldNames) {
@@ -214,9 +210,9 @@ export const deactivateListing = validatedActionWithUser(
   }
 );
 
-export async function fetchOwnerListings(
+export const fetchOwnerListings = async (
   ownerId: number,
   options: { page: number; pageSize: number; sort: OwnerListingSort }
-) {
+) => {
   return getListingsForOwner(ownerId, options);
-}
+};

@@ -1,13 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useActionState, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import type { OwnerListing, ListingStatus } from '@/lib/types/listing';
 import { ListingForm, type ListingFormCopy, type ListingFormValues } from './listing-form';
 import { createListing, updateListing, deactivateListing } from './actions';
+import type { ActionState } from '@/lib/auth/middleware';
 import type { OwnerListingSort } from '@/lib/db/listings';
+import type { ListingFormState } from './actions';
 import { useFormStatus } from 'react-dom';
+
+const submitCreateListing = async (
+  state: ListingFormState,
+  formData: FormData
+) => {
+  return (await createListing(state, formData)) as ListingFormState;
+};
+
+const submitUpdateListing = async (
+  state: ListingFormState,
+  formData: FormData
+) => {
+  return (await updateListing(state, formData)) as ListingFormState;
+};
 
 const STATUS_BADGE_STYLES: Record<ListingStatus, string> = {
   draft: 'bg-amber-100 text-amber-700 border-amber-200',
@@ -112,9 +128,14 @@ function DeactivateListingForm({
   pendingLabel: string;
   confirmMessage: string;
 }) {
+  const [, formAction] = useActionState<ActionState, FormData>(
+    deactivateListing,
+    {}
+  );
+
   return (
     <form
-      action={deactivateListing}
+      action={formAction}
       onSubmit={(event) => {
         if (!window.confirm(confirmMessage)) {
           event.preventDefault();
@@ -224,7 +245,7 @@ export function MyListingsManager({
         {showCreate ? (
           <ListingForm
             key="create"
-            action={createListing}
+            action={submitCreateListing}
             locale={locale}
             copy={createFormCopy}
             showStatus
@@ -323,7 +344,7 @@ export function MyListingsManager({
                         <td colSpan={5} className="bg-slate-50 px-4 py-6">
                           <ListingForm
                             key={`edit-${listing.id}`}
-                            action={updateListing}
+                            action={submitUpdateListing}
                             locale={locale}
                             copy={updateFormCopy}
                             listingId={listing.id}

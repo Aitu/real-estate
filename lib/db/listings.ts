@@ -294,6 +294,7 @@ export async function getListingsForOwner(
 
   const mapped = records.map((record) => ({
     ...record,
+    transactionType: record.transactionType === 'rent' ? 'rent' : 'sale',
     status: record.status as ListingStatus,
     publishedAt: record.publishedAt ? record.publishedAt.toISOString() : null,
     createdAt: record.createdAt.toISOString(),
