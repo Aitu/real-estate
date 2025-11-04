@@ -6,8 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
-import { updateAccount } from '@/app/(login)/actions';
-import { User } from '@/lib/db/schema';
+import { updateAccount } from '@/app/(dashboard)/actions';
+import type { CurrentUser } from '@/lib/db/queries';
 import useSWR from 'swr';
 import { Suspense } from 'react';
 
@@ -62,7 +62,7 @@ function AccountForm({
 }
 
 function AccountFormWithData({ state }: { state: ActionState }) {
-  const { data: user } = useSWR<User>('/api/user', fetcher);
+  const { data: user } = useSWR<CurrentUser>('/api/user', fetcher);
   return (
     <AccountForm
       state={state}

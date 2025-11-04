@@ -3,7 +3,6 @@ import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 import { SWRConfig } from 'swr';
 import { ReactNode } from 'react';
-import { getUser, getTeamForUser } from '@/lib/db/queries';
 import { SessionProviders } from '@/components/providers/session-provider';
 
 export const metadata: Metadata = {
@@ -36,14 +35,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="min-h-[100dvh] bg-neutral-50">
-        <SWRConfig
-          value={{
-            fallback: {
-              '/api/user': getUser(),
-              '/api/team': getTeamForUser()
-            }
-          }}
-        >
+        <SWRConfig value={{ fallback: { '/api/user': null, '/api/team': null } }}>
           <SessionProviders>{children}</SessionProviders>
         </SWRConfig>
       </body>

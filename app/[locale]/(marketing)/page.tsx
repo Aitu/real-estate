@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { isLocale, type Locale } from '@/lib/i18n/config';
 import { loadMessages } from '@/lib/i18n/get-messages';
 import { getTranslator } from '@/lib/i18n/server';
@@ -10,7 +11,7 @@ import { notFound } from 'next/navigation';
 export default async function LandingPage({
   params
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) {
@@ -80,7 +81,9 @@ function HeroSection({
             {cta}
           </div>
         </div>
-        <ListingSearchForm />
+        <Suspense fallback={null}>
+          <ListingSearchForm />
+        </Suspense>
       </div>
     </section>
   );
