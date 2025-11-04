@@ -29,9 +29,17 @@ export default async function LandingPage({
 
   return (
     <div className="flex flex-col gap-24 pb-16">
-      <HeroSection title={tHero('title')} subtitle={tHero('subtitle')} cta={tHero('cta')} />
+      <HeroSection
+        anchor="buy"
+        title={tHero('title')}
+        subtitle={tHero('subtitle')}
+        cta={tHero('cta')}
+      />
 
-      <section id="listings" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 sm:px-6 lg:px-8">
+      <section
+        id="rent"
+        className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 sm:px-6 lg:px-8"
+      >
         <header className="flex flex-col gap-2">
           <h2 className="text-2xl font-semibold text-slate-900 md:text-3xl">
             {tListings('sectionTitle')}
@@ -43,7 +51,10 @@ export default async function LandingPage({
         <ListingGrid listings={listings} />
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+      <section
+        id="sell"
+        className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8"
+      >
         <div className="flex flex-col gap-4">
           <h2 className="text-2xl font-semibold text-slate-900 md:text-3xl">{tMap('title')}</h2>
           <ListingsMap listings={listings} />
@@ -54,16 +65,21 @@ export default async function LandingPage({
 }
 
 function HeroSection({
+  anchor,
   title,
   subtitle,
   cta
 }: {
+  anchor: string;
   title: string;
   subtitle: string;
   cta: string;
 }) {
   return (
-    <section className="relative isolate overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <section
+      id={anchor}
+      className="relative isolate overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800"
+    >
       <div className="absolute inset-0 opacity-40" aria-hidden="true">
         <div className="absolute -left-10 top-16 h-72 w-72 rounded-full bg-amber-400 blur-3xl" />
         <div className="absolute bottom-10 right-0 h-80 w-80 rounded-full bg-slate-500 blur-3xl" />
