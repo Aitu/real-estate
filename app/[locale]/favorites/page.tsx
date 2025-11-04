@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { isLocale } from '@/lib/i18n/config';
 import { getUser } from '@/lib/db/queries';
 import { getFavoriteListingSummaries } from '@/lib/db/favorites';
@@ -9,7 +9,7 @@ export default async function FavoritesPage({
 }: {
   params: { locale: string };
 }) {
-  const { locale } = params;
+  const { locale } = await params;
 
   if (!isLocale(locale)) {
     notFound();
@@ -18,13 +18,8 @@ export default async function FavoritesPage({
   const user = await getUser();
 
   if (!user) {
-    return (
-      <FavoritesDashboard
-        initialFavorites={[]}
-        isAuthenticated={false}
-        signInPath={`/${locale}/login`}
-      />
-    );
+    const callbackUrl = encodeURIComponent(`/${locale}/favorites`);
+    redirect(`/${locale}/login?callbackUrl=${callbackUrl}`);
   }
 
   const favorites = await getFavoriteListingSummaries(user.id);

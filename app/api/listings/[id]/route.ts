@@ -3,9 +3,9 @@ import { getListingDetail } from '@/lib/db/listings';
 
 export async function GET(
   _request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id: idParam } = context.params;
+  const { id: idParam } = await context.params;
   const listingId = Number(idParam);
 
   if (!idParam || Number.isNaN(listingId)) {

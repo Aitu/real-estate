@@ -6,9 +6,11 @@ import {
   getUser,
   updateTeamSubscription
 } from '@/lib/db/queries';
+import { defaultLocale, isLocale } from '@/lib/i18n/config';
+import { getLocalizedPath } from '@/lib/i18n/locale-matcher';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-04-30.basil'
+  apiVersion: '2025-08-27.basil'
 });
 
 export async function createCheckoutSession({
@@ -19,9 +21,12 @@ export async function createCheckoutSession({
   priceId: string;
 }) {
   const user = await getUser();
+  const maybeLocale = user?.locale ?? '';
+  const locale = isLocale(maybeLocale) ? maybeLocale : defaultLocale;
 
   if (!team || !user) {
-    redirect(`/sign-up?redirect=checkout&priceId=${priceId}`);
+    const signupPath = getLocalizedPath(locale, '/signup');
+    redirect(`${signupPath}?redirect=checkout&priceId=${priceId}`);
   }
 
   const session = await stripe.checkout.sessions.create({

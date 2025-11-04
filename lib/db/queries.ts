@@ -1,39 +1,65 @@
 import { desc, and, eq, isNull } from 'drizzle-orm';
+import { auth } from '@/auth';
 import { db } from './drizzle';
 import { activityLogs, teamMembers, teams, users } from './schema';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/auth/session';
 
-export async function getUser() {
-  const sessionCookie = (await cookies()).get('session');
-  if (!sessionCookie || !sessionCookie.value) {
+export type CurrentUser = {
+  id: number;
+  name: string | null;
+  email: string;
+  role: string;
+  locale: string | null;
+  phoneNumber: string | null;
+  avatarUrl: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export async function getUser(): Promise<CurrentUser | null> {
+  const session = await auth();
+  const userId =
+    typeof session?.user?.id === 'string'
+      ? Number.parseInt(session.user.id, 10)
+      : typeof session?.user?.id === 'number'
+      ? session.user.id
+      : null;
+
+  if (!userId) {
     return null;
   }
 
-  const sessionData = await verifyToken(sessionCookie.value);
-  if (
-    !sessionData ||
-    !sessionData.user ||
-    typeof sessionData.user.id !== 'number'
-  ) {
+  const user = await db.query.users.findFirst({
+    where: and(eq(users.id, userId), isNull(users.deletedAt)),
+    columns: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      locale: true,
+      phoneNumber: true,
+      avatarUrl: true,
+      createdAt: true,
+      updatedAt: true,
+      passwordHash: false,
+      deletedAt: false
+    }
+  });
+
+  if (!user) {
     return null;
   }
 
-  if (new Date(sessionData.expires) < new Date()) {
-    return null;
-  }
-
-  const user = await db
-    .select()
-    .from(users)
-    .where(and(eq(users.id, sessionData.user.id), isNull(users.deletedAt)))
-    .limit(1);
-
-  if (user.length === 0) {
-    return null;
-  }
-
-  return user[0];
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    locale: user.locale,
+    phoneNumber: user.phoneNumber,
+    avatarUrl: user.avatarUrl,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt
+  };
 }
 
 export async function getTeamByStripeCustomerId(customerId: string) {

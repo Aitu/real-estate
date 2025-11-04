@@ -1,7 +1,9 @@
 import { z } from 'zod';
-import { TeamDataWithMembers, User } from '@/lib/db/schema';
-import { getTeamForUser, getUser } from '@/lib/db/queries';
+import { TeamDataWithMembers } from '@/lib/db/schema';
+import { CurrentUser, getTeamForUser, getUser } from '@/lib/db/queries';
 import { redirect } from 'next/navigation';
+import { defaultLocale } from '@/lib/i18n/config';
+import { getLocalizedPath } from '@/lib/i18n/locale-matcher';
 
 export type ActionState = {
   error?: string;
@@ -31,7 +33,7 @@ export function validatedAction<S extends z.ZodType<any, any>, T>(
 type ValidatedActionWithUserFunction<S extends z.ZodType<any, any>, T> = (
   data: z.infer<S>,
   formData: FormData,
-  user: User
+  user: CurrentUser
 ) => Promise<T>;
 
 export function validatedActionWithUser<S extends z.ZodType<any, any>, T>(
@@ -62,7 +64,7 @@ export function withTeam<T>(action: ActionWithTeamFunction<T>) {
   return async (formData: FormData): Promise<T> => {
     const user = await getUser();
     if (!user) {
-      redirect('/sign-in');
+      redirect(getLocalizedPath(defaultLocale, '/login'));
     }
 
     const team = await getTeamForUser();

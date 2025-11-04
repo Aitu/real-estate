@@ -11,14 +11,15 @@ import {
 } from '@/components/ui/card';
 import { customerPortalAction } from '@/lib/payments/actions';
 import { useActionState } from 'react';
-import { TeamDataWithMembers, User } from '@/lib/db/schema';
-import { removeTeamMember, inviteTeamMember } from '@/app/(login)/actions';
+import { TeamDataWithMembers } from '@/lib/db/schema';
+import { removeTeamMember, inviteTeamMember } from '@/app/(dashboard)/actions';
 import useSWR from 'swr';
 import { Suspense } from 'react';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Loader2, PlusCircle } from 'lucide-react';
+import type { CurrentUser } from '@/lib/db/queries';
 
 type ActionState = {
   error?: string;
@@ -100,7 +101,9 @@ function TeamMembers() {
     FormData
   >(removeTeamMember, {});
 
-  const getUserDisplayName = (user: Pick<User, 'id' | 'name' | 'email'>) => {
+  const getUserDisplayName = (
+    user: Pick<CurrentUser, 'id' | 'name' | 'email'>
+  ) => {
     return user.name || user.email || 'Unknown User';
   };
 
@@ -188,7 +191,7 @@ function InviteTeamMemberSkeleton() {
 }
 
 function InviteTeamMember() {
-  const { data: user } = useSWR<User>('/api/user', fetcher);
+  const { data: user } = useSWR<CurrentUser>('/api/user', fetcher);
   const isOwner = user?.role === 'owner';
   const [inviteState, inviteAction, isInvitePending] = useActionState<
     ActionState,
