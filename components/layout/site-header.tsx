@@ -205,13 +205,13 @@ function UserDropdown({
       <DropdownMenuContent className="w-48" align="end">
         <DropdownMenuLabel>{tNav('favorites')}</DropdownMenuLabel>
         <DropdownMenuItem asChild>
-          <Link href="/favorites">{tNav('favorites')}</Link>
+          <Link href={`/${locale}/favorites`}>{tNav('favorites')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/my-listings">{tNav('myListings')}</Link>
+          <Link href={`/${locale}/my-listings`}>{tNav('myListings')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/alerts">{tNav('alerts')}</Link>
+          <Link href={`/${locale}/alerts`}>{tNav('alerts')}</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-rose-600">

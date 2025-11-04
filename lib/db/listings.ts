@@ -1,4 +1,4 @@
-import { asc, eq } from 'drizzle-orm';
+import { asc, desc, eq } from 'drizzle-orm';
 import { db } from './drizzle';
 import { listings } from './schema';
 import type { ListingDetail } from '@/lib/types/listing';
@@ -139,6 +139,42 @@ export async function getListingDetail(
   }
 
   return mapListingRecord(record as ListingWithRelations);
+}
+
+export type OwnerListingSummary = {
+  id: number;
+  slug: string;
+  title: string;
+  status: string;
+  price: number;
+  transactionType: 'sale' | 'rent';
+  city: string;
+  updatedAt: string;
+};
+
+export async function getListingsForOwner(
+  ownerId: number
+): Promise<OwnerListingSummary[]> {
+  const rows = await db
+    .select({
+      id: listings.id,
+      slug: listings.slug,
+      title: listings.title,
+      status: listings.status,
+      price: listings.price,
+      transactionType: listings.transactionType,
+      city: listings.city,
+      updatedAt: listings.updatedAt,
+    })
+    .from(listings)
+    .where(eq(listings.ownerId, ownerId))
+    .orderBy(desc(listings.updatedAt));
+
+  return rows.map((row) => ({
+    ...row,
+    transactionType: row.transactionType as 'sale' | 'rent',
+    updatedAt: row.updatedAt.toISOString(),
+  }));
 }
 
 export async function getListingDetailBySlug(
