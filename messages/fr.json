@@ -85,5 +85,137 @@
   "footer": {
     "tagline": "LuxNest vous aide à comparer les biens, suivre les prix et contacter des agents de confiance.",
     "legal": "© {year} LuxNest. Tous droits réservés."
+  },
+  "myListings": {
+    "heading": {
+      "title": "Mes annonces",
+      "subtitle": "Gérez les biens que vous publiez et maintenez leurs informations à jour."
+    },
+    "createButton": "Nouvelle annonce",
+    "table": {
+      "headers": {
+        "listing": "Annonce",
+        "status": "Statut",
+        "price": "Prix",
+        "updated": "Dernière mise à jour",
+        "actions": "Actions"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "deactivate": "Désactiver",
+        "deactivatePending": "Désactivation…",
+        "confirmDeactivate": "Voulez-vous vraiment désactiver cette annonce ?"
+      },
+      "noResults": "Vous n'avez pas encore créé d'annonce."
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "summary": "Affichage {from}–{to} sur {total} annonces"
+    },
+    "sort": {
+      "label": "Trier par",
+      "options": {
+        "createdDesc": "Les plus récentes",
+        "createdAsc": "Les plus anciennes",
+        "priceDesc": "Prix : décroissant",
+        "priceAsc": "Prix : croissant"
+      }
+    },
+    "form": {
+      "fields": {
+        "title": {
+          "label": "Titre",
+          "placeholder": "Appartement de standing au centre"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Décrivez les atouts principaux du bien."
+        },
+        "propertyType": {
+          "label": "Type de bien",
+          "placeholder": "Sélectionnez un type de bien"
+        },
+        "status": {
+          "label": "Statut"
+        },
+        "price": {
+          "label": "Prix",
+          "placeholder": "350000"
+        },
+        "currency": {
+          "label": "Devise",
+          "placeholder": "EUR"
+        },
+        "city": {
+          "label": "Ville",
+          "placeholder": "Luxembourg"
+        },
+        "postalCode": {
+          "label": "Code postal",
+          "placeholder": "L-1330"
+        },
+        "country": {
+          "label": "Pays",
+          "placeholder": "LU"
+        },
+        "street": {
+          "label": "Rue",
+          "placeholder": "12 Grand Rue"
+        },
+        "bedrooms": {
+          "label": "Chambres",
+          "placeholder": "3"
+        },
+        "bathrooms": {
+          "label": "Salles de bain",
+          "placeholder": "2"
+        },
+        "area": {
+          "label": "Surface (m²)",
+          "placeholder": "120"
+        }
+      },
+      "transaction": {
+        "label": "Type de transaction",
+        "sale": "À vendre",
+        "rent": "À louer"
+      },
+      "propertyTypes": {
+        "apartment": "Appartement",
+        "house": "Maison",
+        "duplex": "Duplex",
+        "penthouse": "Penthouse",
+        "office": "Bureau",
+        "land": "Terrain"
+      },
+      "statusHelp": "Les annonces en brouillon restent privées tant que vous ne les publiez pas.",
+      "buttons": {
+        "cancel": "Annuler",
+        "create": {
+          "submit": "Créer l'annonce",
+          "submitting": "Création…"
+        },
+        "update": {
+          "submit": "Enregistrer",
+          "submitting": "Enregistrement…"
+        }
+      }
+    },
+    "statuses": {
+      "draft": "Brouillon",
+      "published": "Publiée",
+      "inactive": "Inactive"
+    },
+    "errors": {
+      "create": "Impossible de créer l'annonce. Veuillez réessayer.",
+      "update": "Impossible de mettre à jour l'annonce. Veuillez réessayer.",
+      "deactivate": "Impossible de désactiver l'annonce. Veuillez réessayer."
+    },
+    "messages": {
+      "createSuccess": "Annonce créée avec succès.",
+      "updateSuccess": "Annonce mise à jour avec succès.",
+      "deactivateSuccess": "Annonce désactivée."
+    }
   }
 }
