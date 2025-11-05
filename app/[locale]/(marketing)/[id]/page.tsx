@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as Icons from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -8,12 +9,48 @@ import { getListingDetail } from '@/lib/db/listings';
 import { isLocale, type Locale } from '@/lib/i18n/config';
 import { loadMessages } from '@/lib/i18n/get-messages';
 import { getTranslator } from '@/lib/i18n/server';
+import { formatCurrency } from '@/lib/i18n/format';
 
-const LOCALE_TO_TAG: Record<Locale, string> = {
-  en: 'en-LU',
-  fr: 'fr-LU',
-  de: 'de-LU',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string; id: string };
+}): Promise<Metadata> {
+  const { locale: localeParam, id } = params;
+
+  if (!isLocale(localeParam)) {
+    return {};
+  }
+
+  const listingId = Number(id);
+  if (!Number.isFinite(listingId)) {
+    return {};
+  }
+
+  const locale = localeParam as Locale;
+
+  const [messages, listing] = await Promise.all([
+    loadMessages(locale),
+    getListingDetail(listingId),
+  ]);
+
+  if (!listing) {
+    return {};
+  }
+
+  const t = getTranslator(locale, messages, 'listingDetail');
+  const description = listing.description ?? t('descriptionFallback');
+  const trimmedDescription =
+    description.length > 160 ? `${description.slice(0, 157)}…` : description;
+
+  return {
+    title: `${listing.title} | LuxNest`,
+    description: trimmedDescription,
+    alternates: {
+      canonical: `/${locale}/listings/${listing.id}`,
+    },
+  };
+}
 
 export default async function ListingDetailPage({
   params,
@@ -43,13 +80,10 @@ export default async function ListingDetailPage({
   }
 
   const t = getTranslator(locale, messages, 'listingDetail');
-  const localeTag = LOCALE_TO_TAG[locale];
-  const formatter = new Intl.NumberFormat(localeTag, {
-    style: 'currency',
+  const formattedPrice = formatCurrency(listing.price, {
+    locale,
     currency: listing.currency,
-    maximumFractionDigits: 0,
   });
-  const formattedPrice = formatter.format(listing.price);
   const priceLabel =
     listing.transactionType === 'rent'
       ? t('pricePerMonth', { values: { price: formattedPrice } })

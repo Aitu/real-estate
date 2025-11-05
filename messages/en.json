@@ -6,6 +6,7 @@
     "sell": "Sell",
     "login": "Log in",
     "signup": "Sign up",
+    "account": "Account",
     "favorites": "Favorites",
     "myListings": "My listings",
     "alerts": "Alerts",
@@ -162,8 +163,166 @@
   "map": {
     "title": "Map view"
   },
+  "favorites": {
+    "pageTitle": "Saved homes",
+    "pageSubtitle": "Keep track of the listings you love and monitor price shifts at a glance.",
+    "authRequiredTitle": "Sign in to save favorites",
+    "authRequiredDescription": "Create an account or sign in to collect listings in one place.",
+    "authRequiredCta": "Go to sign in",
+    "emptyTitle": "You haven't saved any listings yet",
+    "emptyDescription": "Tap the heart on a listing to add it to your favorites.",
+    "quickFiltersLabel": "Quick filters",
+    "trendHeading": "Price outlook",
+    "trendDescription": "Average asking price based on your favorites over the past six months.",
+    "trendEmpty": "Add a few favorites to unlock insights.",
+    "avgPriceLabel": "Current average",
+    "favoritesCountLabel": "Saved total",
+    "favoritesCount": "{count} favorites",
+    "removeError": "We couldn't update this favorite. Try again.",
+    "filters": {
+      "all": "All",
+      "apartment": "Apartments",
+      "house": "Houses",
+      "duplex": "Duplexes",
+      "penthouse": "Penthouses",
+      "office": "Offices",
+      "land": "Land"
+    }
+  },
   "footer": {
     "tagline": "LuxNest helps you compare properties, follow price trends, and connect with trusted agents.",
     "legal": "© {year} LuxNest. All rights reserved."
+  },
+  "myListings": {
+    "heading": {
+      "title": "My listings",
+      "subtitle": "Manage the properties you publish and keep their information up to date."
+    },
+    "createButton": "New listing",
+    "table": {
+      "headers": {
+        "listing": "Listing",
+        "status": "Status",
+        "price": "Price",
+        "updated": "Last updated",
+        "actions": "Actions"
+      },
+      "actions": {
+        "edit": "Edit",
+        "deactivate": "Deactivate",
+        "deactivatePending": "Deactivating…",
+        "confirmDeactivate": "Are you sure you want to deactivate this listing?"
+      },
+      "noResults": "You haven't created any listings yet."
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "summary": "Showing {from}–{to} of {total} listings"
+    },
+    "sort": {
+      "label": "Sort by",
+      "options": {
+        "createdDesc": "Newest first",
+        "createdAsc": "Oldest first",
+        "priceDesc": "Price: High to low",
+        "priceAsc": "Price: Low to high"
+      }
+    },
+    "form": {
+      "fields": {
+        "title": {
+          "label": "Title",
+          "placeholder": "Luxurious downtown apartment"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Describe the key selling points of the property."
+        },
+        "propertyType": {
+          "label": "Property type",
+          "placeholder": "Select a property type"
+        },
+        "status": {
+          "label": "Status"
+        },
+        "price": {
+          "label": "Price",
+          "placeholder": "350000"
+        },
+        "currency": {
+          "label": "Currency",
+          "placeholder": "EUR"
+        },
+        "city": {
+          "label": "City",
+          "placeholder": "Luxembourg"
+        },
+        "postalCode": {
+          "label": "Postal code",
+          "placeholder": "L-1330"
+        },
+        "country": {
+          "label": "Country",
+          "placeholder": "LU"
+        },
+        "street": {
+          "label": "Street",
+          "placeholder": "12 Grand Rue"
+        },
+        "bedrooms": {
+          "label": "Bedrooms",
+          "placeholder": "3"
+        },
+        "bathrooms": {
+          "label": "Bathrooms",
+          "placeholder": "2"
+        },
+        "area": {
+          "label": "Area (sqm)",
+          "placeholder": "120"
+        }
+      },
+      "transaction": {
+        "label": "Transaction type",
+        "sale": "For sale",
+        "rent": "For rent"
+      },
+      "propertyTypes": {
+        "apartment": "Apartment",
+        "house": "House",
+        "duplex": "Duplex",
+        "penthouse": "Penthouse",
+        "office": "Office",
+        "land": "Land"
+      },
+      "statusHelp": "Draft listings remain private until you publish them.",
+      "buttons": {
+        "cancel": "Cancel",
+        "create": {
+          "submit": "Create listing",
+          "submitting": "Creating…"
+        },
+        "update": {
+          "submit": "Save changes",
+          "submitting": "Saving…"
+        }
+      }
+    },
+    "statuses": {
+      "draft": "Draft",
+      "published": "Published",
+      "inactive": "Inactive"
+    },
+    "errors": {
+      "create": "We couldn't create the listing. Please try again.",
+      "update": "We couldn't update the listing. Please try again.",
+      "deactivate": "We couldn't deactivate the listing. Please try again."
+    },
+    "messages": {
+      "createSuccess": "Listing created successfully.",
+      "updateSuccess": "Listing updated successfully.",
+      "deactivateSuccess": "Listing deactivated."
+    }
   }
 }

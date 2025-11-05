@@ -1,7 +1,11 @@
-import { eq } from 'drizzle-orm';
-import { db } from '@/lib/db/drizzle';
-import { listings, listingImages, propertyFeatures } from '@/lib/db/schema';
-import { mockListings } from '@/lib/mock/listings';
+import { and, desc, eq } from 'drizzle-orm';
+import { db } from './drizzle';
+import {
+  favorites,
+  listings,
+  listingImages,
+  propertyFeatures
+} from './schema';
 import type { ListingSummary } from '@/lib/types/listing';
 
 type ListingSummaryRecord = typeof listings.$inferSelect & {
@@ -29,8 +33,7 @@ function toListingSummary(record: ListingSummaryRecord): ListingSummary {
     });
 
   const primaryImage =
-    images.find((image) => image.isPrimary)?.url ??
-    images[0]?.url ??
+    images.find((image) => image.isPrimary)?.url ?? images[0]?.url ??
     'https://images.unsplash.com/photo-1600585154340-0ef3c08ba9f9?auto=format&fit=crop&w=1280&q=80';
 
   const highlights = record.features
@@ -70,14 +73,11 @@ function toListingSummary(record: ListingSummaryRecord): ListingSummary {
   };
 }
 
-async function getPublishedListingSummaries(limit = mockListings.length): Promise<ListingSummary[]> {
-  const records = await db.query.listings.findMany({
-    where: eq(listings.status, 'published'),
-    orderBy: (fields, operators) => [
-      operators.desc(fields.publishedAt),
-      operators.desc(fields.createdAt),
-    ],
-    limit,
+async function getListingSummaryById(
+  listingId: number
+): Promise<ListingSummary | null> {
+  const listingRecord = await db.query.listings.findFirst({
+    where: eq(listings.id, listingId),
     columns: {
       id: true,
       title: true,
@@ -116,13 +116,85 @@ async function getPublishedListingSummaries(limit = mockListings.length): Promis
     },
   });
 
-  return records.map((record) => toListingSummary(record as ListingSummaryRecord));
+  if (!listingRecord) {
+    return null;
+  }
+
+  return toListingSummary(listingRecord as ListingSummaryRecord);
 }
 
-export async function getFeaturedListings(): Promise<ListingSummary[]> {
-  const liveListings = await getPublishedListingSummaries();
-  const existingIds = new Set(liveListings.map((listing) => listing.id));
-  const fallback = mockListings.filter((listing) => !existingIds.has(listing.id));
+export async function getFavoriteListingSummaries(
+  userId: number
+): Promise<ListingSummary[]> {
+  const favoriteRecords = await db.query.favorites.findMany({
+    where: eq(favorites.userId, userId),
+    orderBy: (fields) => [desc(fields.createdAt)],
+    with: {
+      listing: {
+        columns: {
+          id: true,
+          title: true,
+          propertyType: true,
+          transactionType: true,
+          price: true,
+          currency: true,
+          bedrooms: true,
+          bathrooms: true,
+          area: true,
+          street: true,
+          city: true,
+          postalCode: true,
+          country: true,
+          latitude: true,
+          longitude: true,
+        },
+        with: {
+          images: {
+            columns: {
+              id: true,
+              url: true,
+              alt: true,
+              isPrimary: true,
+              displayOrder: true,
+            },
+          },
+          features: {
+            columns: {
+              id: true,
+              label: true,
+              value: true,
+            },
+            limit: 3,
+          },
+        },
+      },
+    },
+  });
 
-  return [...liveListings, ...fallback];
+  return favoriteRecords
+    .map((favorite) => favorite.listing)
+    .filter((listing): listing is ListingSummaryRecord => Boolean(listing))
+    .map((listing) => toListingSummary(listing));
+}
+
+export async function addFavorite(
+  userId: number,
+  listingId: number
+): Promise<ListingSummary | null> {
+  await db
+    .insert(favorites)
+    .values({ userId, listingId })
+    .onConflictDoNothing({
+      target: [favorites.userId, favorites.listingId],
+    });
+
+  return await getListingSummaryById(listingId);
+}
+
+export async function removeFavorite(userId: number, listingId: number) {
+  await db
+    .delete(favorites)
+    .where(
+      and(eq(favorites.userId, userId), eq(favorites.listingId, listingId))
+    );
 }
