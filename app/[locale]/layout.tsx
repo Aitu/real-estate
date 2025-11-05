@@ -24,19 +24,9 @@ export default async function LocaleLayout({
   }
 
   const messages = await loadMessages(requestedLocale);
-  const headerList = await headers();
-  const currentUrl = headerList.get('next-url') ?? '/';
 
-  const AUTH_SEGMENTS = ['login', 'signup', 'forgot-password', 'reset-password'];
-  const hideShell =
-    AUTH_SEGMENTS.some((segment) => currentUrl.endsWith(`/${segment}`)) ||
-    currentUrl.endsWith('/not-found');
-
-  const pageContent: ReactNode = hideShell ? (
-    children
-  ) : (
+  const pageContent: ReactNode = (
     <div className="flex min-h-[100dvh] flex-col bg-neutral-50 dark:bg-slate-950">
-      <SiteHeader />
       <div className="flex-1">{children}</div>
     </div>
   );

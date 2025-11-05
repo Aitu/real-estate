@@ -29,7 +29,7 @@ import {
   saveListingDraftAction,
   updateListingStatusAction,
   uploadListingMediaAction,
-} from '@/app/[locale]/my-listings/actions';
+} from '@/app/[locale]/(marketing)/my-listings/actions';
 import type { Locale } from '@/lib/i18n/config';
 
 type ListingImageItem = {
@@ -961,9 +961,9 @@ export function ListingWizard({
                       <dd>
                         {watchedValues.price
                           ? new Intl.NumberFormat('en-US', {
-                              style: 'currency',
-                              currency: watchedValues.currency ?? 'EUR',
-                            }).format(watchedValues.price)
+                            style: 'currency',
+                            currency: watchedValues.currency ?? 'EUR',
+                          }).format(watchedValues.price)
                           : '—'}
                       </dd>
                     </div>
