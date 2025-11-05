@@ -42,7 +42,7 @@ export default async function EditListingPage({
 }: {
   params: { locale: string; listingId: string };
 }) {
-  const { locale, listingId } = params;
+  const { locale, listingId } = await params;
 
   if (!isLocale(locale)) {
     notFound();
