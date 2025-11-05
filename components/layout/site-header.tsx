@@ -211,7 +211,7 @@ function UserDropdown({
           <Link href="/my-listings">{tNav('myListings')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/alerts">{tNav('alerts')}</Link>
+          <Link href={`/${locale}/alerts`}>{tNav('alerts')}</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-rose-600">
