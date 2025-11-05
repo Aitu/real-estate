@@ -1,4 +1,4 @@
-import { asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { db } from './drizzle';
 import { listings } from './schema';
 import type { ListingDetail } from '@/lib/types/listing';
@@ -8,6 +8,7 @@ import type {
   PropertyFeature as PropertyFeatureRow,
   User,
 } from './schema';
+import type { ListingStatus, OwnerListing } from '@/lib/types/listing';
 
 type ListingWithRelations = ListingRow & {
   owner: Pick<User, 'id' | 'name' | 'email' | 'phoneNumber' | 'avatarUrl' | 'locale'> | null;
@@ -141,42 +142,6 @@ export async function getListingDetail(
   return mapListingRecord(record as ListingWithRelations);
 }
 
-export type OwnerListingSummary = {
-  id: number;
-  slug: string;
-  title: string;
-  status: string;
-  price: number;
-  transactionType: 'sale' | 'rent';
-  city: string;
-  updatedAt: string;
-};
-
-export async function getListingsForOwner(
-  ownerId: number
-): Promise<OwnerListingSummary[]> {
-  const rows = await db
-    .select({
-      id: listings.id,
-      slug: listings.slug,
-      title: listings.title,
-      status: listings.status,
-      price: listings.price,
-      transactionType: listings.transactionType,
-      city: listings.city,
-      updatedAt: listings.updatedAt,
-    })
-    .from(listings)
-    .where(eq(listings.ownerId, ownerId))
-    .orderBy(desc(listings.updatedAt));
-
-  return rows.map((row) => ({
-    ...row,
-    transactionType: row.transactionType as 'sale' | 'rent',
-    updatedAt: row.updatedAt.toISOString(),
-  }));
-}
-
 export async function getListingDetailBySlug(
   slug: string
 ): Promise<ListingDetail | null> {
@@ -224,4 +189,284 @@ export async function getListingDetailBySlug(
   }
 
   return mapListingRecord(record as ListingWithRelations);
+}
+
+function slugify(input: string) {
+  return input
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+async function generateUniqueSlug(title: string): Promise<string> {
+  const base = slugify(title);
+  if (!base) {
+    throw new Error('Listing title cannot produce a slug');
+  }
+
+  let slug = base;
+  let suffix = 1;
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const existing = await db.query.listings.findFirst({
+      where: eq(listings.slug, slug),
+      columns: { id: true },
+    });
+
+    if (!existing) {
+      return slug;
+    }
+
+    slug = `${base}-${suffix++}`;
+  }
+}
+
+export type OwnerListingSort =
+  | 'created-desc'
+  | 'created-asc'
+  | 'price-desc'
+  | 'price-asc';
+
+export async function getListingsForOwner(
+  ownerId: number,
+  {
+    page,
+    pageSize,
+    sort,
+  }: { page: number; pageSize: number; sort: OwnerListingSort }
+): Promise<{ listings: OwnerListing[]; totalCount: number }> {
+  const currentPage = Number.isFinite(page) && page > 0 ? page : 1;
+  const limit = Number.isFinite(pageSize) && pageSize > 0 ? pageSize : 10;
+  const offset = (currentPage - 1) * limit;
+
+  const [records, countResult] = await Promise.all([
+    db.query.listings.findMany({
+      where: eq(listings.ownerId, ownerId),
+      columns: {
+        id: true,
+        slug: true,
+        title: true,
+        description: true,
+        propertyType: true,
+        transactionType: true,
+        status: true,
+        price: true,
+        currency: true,
+        city: true,
+        postalCode: true,
+        country: true,
+        street: true,
+        bedrooms: true,
+        bathrooms: true,
+        area: true,
+        publishedAt: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: (fields, operators) => {
+        switch (sort) {
+          case 'created-asc':
+            return [operators.asc(fields.createdAt)];
+          case 'price-desc':
+            return [operators.desc(fields.price), operators.desc(fields.id)];
+          case 'price-asc':
+            return [operators.asc(fields.price), operators.desc(fields.id)];
+          case 'created-desc':
+          default:
+            return [operators.desc(fields.createdAt)];
+        }
+      },
+      limit,
+      offset,
+    }),
+    db
+      .select({ value: sql<number>`count(*)` })
+      .from(listings)
+      .where(eq(listings.ownerId, ownerId))
+      .limit(1),
+  ]);
+
+  const totalCount = countResult[0]?.value ?? 0;
+
+  const mapped = records.map((record) => ({
+    ...record,
+    transactionType: record.transactionType === 'rent' ? 'rent' : 'sale',
+    status: record.status as ListingStatus,
+    publishedAt: record.publishedAt ? record.publishedAt.toISOString() : null,
+    createdAt: record.createdAt.toISOString(),
+    updatedAt: record.updatedAt.toISOString(),
+  } satisfies OwnerListing));
+
+  return { listings: mapped, totalCount };
+}
+
+type ListingInput = {
+  title: string;
+  description: string | null;
+  propertyType: string;
+  transactionType: 'sale' | 'rent';
+  status: ListingStatus;
+  price: number;
+  currency: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  street: string | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  area: number | null;
+};
+
+export async function createListingForOwner(
+  ownerId: number,
+  input: ListingInput
+): Promise<OwnerListing> {
+  const slug = await generateUniqueSlug(input.title);
+  const publishedAt =
+    input.status === 'published' ? new Date() : null;
+
+  const [created] = await db
+    .insert(listings)
+    .values({
+      ownerId,
+      slug,
+      title: input.title,
+      description: input.description,
+      propertyType: input.propertyType,
+      transactionType: input.transactionType,
+      status: input.status,
+      price: input.price,
+      currency: input.currency,
+      city: input.city,
+      postalCode: input.postalCode,
+      country: input.country,
+      street: input.street,
+      bedrooms: input.bedrooms,
+      bathrooms: input.bathrooms,
+      area: input.area,
+      publishedAt,
+    })
+    .returning();
+
+  if (!created) {
+    throw new Error('Failed to create listing');
+  }
+
+  return {
+    id: created.id,
+    slug: created.slug,
+    title: created.title,
+    description: created.description,
+    propertyType: created.propertyType,
+    transactionType: created.transactionType as 'sale' | 'rent',
+    status: created.status as ListingStatus,
+    price: created.price,
+    currency: created.currency,
+    city: created.city,
+    postalCode: created.postalCode,
+    country: created.country,
+    street: created.street,
+    bedrooms: created.bedrooms,
+    bathrooms: created.bathrooms,
+    area: created.area,
+    publishedAt: created.publishedAt
+      ? created.publishedAt.toISOString()
+      : null,
+    createdAt: created.createdAt.toISOString(),
+    updatedAt: created.updatedAt.toISOString(),
+  } satisfies OwnerListing;
+}
+
+export async function updateListingForOwner(
+  ownerId: number,
+  listingId: number,
+  input: ListingInput
+): Promise<OwnerListing> {
+  const existing = await db.query.listings.findFirst({
+    where: and(eq(listings.id, listingId), eq(listings.ownerId, ownerId)),
+    columns: { id: true, slug: true, publishedAt: true },
+  });
+
+  if (!existing) {
+    throw new Error('Listing not found');
+  }
+
+  const publishedAtValue =
+    input.status === 'published'
+      ? existing.publishedAt ?? new Date()
+      : null;
+
+  const [updated] = await db
+    .update(listings)
+    .set({
+      title: input.title,
+      description: input.description,
+      propertyType: input.propertyType,
+      transactionType: input.transactionType,
+      status: input.status,
+      price: input.price,
+      currency: input.currency,
+      city: input.city,
+      postalCode: input.postalCode,
+      country: input.country,
+      street: input.street,
+      bedrooms: input.bedrooms,
+      bathrooms: input.bathrooms,
+      area: input.area,
+      updatedAt: new Date(),
+      publishedAt: publishedAtValue,
+    })
+    .where(eq(listings.id, listingId))
+    .returning();
+
+  if (!updated) {
+    throw new Error('Failed to update listing');
+  }
+
+  return {
+    id: updated.id,
+    slug: updated.slug,
+    title: updated.title,
+    description: updated.description,
+    propertyType: updated.propertyType,
+    transactionType: updated.transactionType as 'sale' | 'rent',
+    status: updated.status as ListingStatus,
+    price: updated.price,
+    currency: updated.currency,
+    city: updated.city,
+    postalCode: updated.postalCode,
+    country: updated.country,
+    street: updated.street,
+    bedrooms: updated.bedrooms,
+    bathrooms: updated.bathrooms,
+    area: updated.area,
+    publishedAt: updated.publishedAt
+      ? updated.publishedAt.toISOString()
+      : null,
+    createdAt: updated.createdAt.toISOString(),
+    updatedAt: updated.updatedAt.toISOString(),
+  } satisfies OwnerListing;
+}
+
+export async function deactivateListingForOwner(
+  ownerId: number,
+  listingId: number
+): Promise<void> {
+  const existing = await db.query.listings.findFirst({
+    where: and(eq(listings.id, listingId), eq(listings.ownerId, ownerId)),
+    columns: { id: true },
+  });
+
+  if (!existing) {
+    throw new Error('Listing not found');
+  }
+
+  await db
+    .update(listings)
+    .set({ status: 'inactive', publishedAt: null, updatedAt: new Date() })
+    .where(eq(listings.id, listingId));
 }

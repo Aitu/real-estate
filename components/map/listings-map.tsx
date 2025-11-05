@@ -14,9 +14,11 @@ const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
 
 mapboxgl.accessToken = MAPBOX_PUBLIC_TOKEN;
 
+type MapInstance = InstanceType<(typeof mapboxgl)['Map']>;
+
 export function ListingsMap({ listings }: ListingsMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<MapInstance | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -31,7 +33,7 @@ export function ListingsMap({ listings }: ListingsMapProps) {
       style: MAPBOX_STYLE,
       center: defaultCenter as [number, number],
       zoom: 10.4
-    });
+    }) as MapInstance;
 
     map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'top-right');
 

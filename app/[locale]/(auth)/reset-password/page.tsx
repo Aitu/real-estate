@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -31,7 +31,7 @@ const resetSchema = z
 
 type ResetValues = z.infer<typeof resetSchema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const [success, setSuccess] = useState(false);
@@ -129,5 +129,13 @@ export default function ResetPasswordPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordPageContent />
+    </Suspense>
   );
 }

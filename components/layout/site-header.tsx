@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import {
-  BadgeEuro,
+  BadgeDollarSign,
   Building2,
-  Heart,
+  Home,
+  Key,
   Menu,
-  Sparkles,
   UserRound,
   X
 } from 'lucide-react';
@@ -26,12 +26,13 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useTranslations, useI18n } from '@/lib/i18n/provider';
 import { useCurrentUser } from '@/hooks/use-current-user';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
 
 const NAV_ITEMS = [
-  { key: 'buy', icon: Building2, href: '#listings' },
-  { key: 'rent', icon: Heart, href: '#listings' },
-  { key: 'new', icon: Sparkles, href: '#listings' },
-  { key: 'sell', icon: BadgeEuro, href: '#listings' }
+  { key: 'buy', icon: Home, anchor: '#buy' },
+  { key: 'rent', icon: Key, anchor: '#rent' },
+  { key: 'sell', icon: BadgeDollarSign, anchor: '#sell' }
 ] as const;
 
 export function SiteHeader() {
@@ -58,27 +59,14 @@ export function SiteHeader() {
   const loginPath = `/${locale}/login`;
   const signupPath = `/${locale}/signup`;
 
-  const authLinks = (
-    <div className="hidden items-center gap-2 md:flex">
-      <Link href={loginPath} className="text-sm font-medium text-slate-600">
-        {tNav('login')}
-      </Link>
-      <Link href={signupPath}>
-        <Button size="sm" className="rounded-full px-4 text-sm">
-          {tNav('signup')}
-        </Button>
-      </Link>
-    </div>
-  );
-
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/90 backdrop-blur dark:border-slate-800/60 dark:bg-slate-950/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           href={`/${locale}`}
-          className="flex items-center gap-2 text-sm font-semibold text-slate-900"
+          className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100"
         >
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-white">
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900">
             <Building2 className="h-4 w-4" aria-hidden="true" />
           </span>
           <span className="hidden text-lg tracking-tight sm:inline">LuxNest</span>

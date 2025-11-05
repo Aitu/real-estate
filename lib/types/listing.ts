@@ -97,3 +97,27 @@ export interface ListingDetail {
   createdAt: string;
   updatedAt: string;
 }
+
+export type ListingStatus = 'draft' | 'published' | 'inactive';
+
+export interface OwnerListing {
+  id: number;
+  slug: string;
+  title: string;
+  description: string | null;
+  propertyType: string;
+  transactionType: 'sale' | 'rent';
+  status: ListingStatus;
+  price: number;
+  currency: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  street: string | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  area: number | null;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
