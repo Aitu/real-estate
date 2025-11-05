@@ -72,19 +72,21 @@ export function SiteHeader() {
           <span className="hidden text-lg tracking-tight sm:inline">LuxNest</span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
-          {NAV_ITEMS.map(({ key, icon: Icon, href }) => {
-            const active = pathname.includes(href.replace('#', ''));
+        <nav className="hidden items-center gap-2 md:flex">
+          {NAV_ITEMS.map(({ key, icon: Icon, anchor }) => {
+            const href = `/${locale}${anchor}`;
+            const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
+            const active = isHome;
             return (
               <Link
                 key={key}
                 href={href}
                 className={cn(
-                  'group flex flex-col items-center gap-1 text-xs font-medium text-slate-500 transition-colors hover:text-slate-900',
-                  active && 'text-slate-900'
+                  'group flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-4 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-white',
+                  active && 'border-slate-900/20 text-slate-900 dark:border-slate-500 dark:text-white'
                 )}
               >
-                <span className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition group-hover:border-slate-300">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/5 text-slate-700 transition group-hover:bg-slate-900/10 dark:bg-slate-100/10 dark:text-slate-200 dark:group-hover:bg-slate-100/20">
                   <Icon className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <span className="tracking-wide">{tNav(key)}</span>
@@ -94,6 +96,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
           {!user && (
             <Link href={loginPath} aria-label={tNav('login')}>
               <Button variant="ghost" size="icon" className="rounded-full">
@@ -113,44 +116,73 @@ export function SiteHeader() {
           </Button>
         </div>
 
-        {user ? (
-          <UserDropdown initials={initials} locale={locale} />
-        ) : (
-          authLinks
-        )}
+        <div className="hidden items-center gap-3 md:flex">
+          <Suspense fallback={null}>
+            <LanguageSwitcher />
+          </Suspense>
+          <ThemeToggle />
+          {user ? (
+            <UserDropdown initials={initials} locale={locale} />
+          ) : (
+            <>
+              <Link
+                href={loginPath}
+                className="text-sm font-medium text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+              >
+                {tNav('login')}
+              </Link>
+              <Link href={signupPath}>
+                <Button size="sm" className="rounded-full px-4 text-sm">
+                  {tNav('signup')}
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
 
       {menuOpen && (
-        <div className="border-t border-slate-200 bg-white shadow-sm md:hidden">
-          <nav className="flex flex-col gap-2 px-4 py-4">
-            {NAV_ITEMS.map(({ key, icon: Icon, href }) => (
+        <div className="border-t border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950 md:hidden">
+          <nav className="flex flex-col gap-3 px-4 py-4">
+            {NAV_ITEMS.map(({ key, icon: Icon, anchor }) => (
               <Link
                 key={key}
-                href={href}
-                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+                href={`/${locale}${anchor}`}
+                className="flex items-center gap-3 rounded-2xl border border-slate-200/70 px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-900"
                 onClick={() => setMenuOpen(false)}
               >
-                <span className="grid h-8 w-8 place-items-center rounded-full border border-slate-200 bg-white">
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900/5 text-slate-700 dark:bg-slate-100/10 dark:text-slate-100">
                   <Icon className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <span>{tNav(key)}</span>
               </Link>
             ))}
-            <div className="flex items-center gap-3 px-3 pt-2">
-              {user ? (
-                <UserDropdown initials={initials} inline locale={locale} />
-              ) : (
+            <div className="flex items-center justify-between px-3">
+              <Suspense fallback={null}>
+                <LanguageSwitcher />
+              </Suspense>
+              <ThemeToggle />
+              {!user && (
                 <>
-                  <Link href={loginPath} className="text-sm font-medium text-slate-600">
+                  <Link
+                    href={loginPath}
+                    className="text-sm font-medium text-slate-600 dark:text-slate-300"
+                    onClick={() => setMenuOpen(false)}
+                  >
                     {tNav('login')}
                   </Link>
-                  <Link href={signupPath} className="ml-auto">
+                  <Link href={signupPath} onClick={() => setMenuOpen(false)}>
                     <Button size="sm" className="rounded-full px-4 text-sm">
                       {tNav('signup')}
                     </Button>
                   </Link>
                 </>
               )}
+            </div>
+            <div className="flex items-center gap-3 px-3 pt-2">
+              {user ? (
+                <UserDropdown initials={initials} inline locale={locale} />
+              ) : null}
             </div>
           </nav>
         </div>
@@ -175,14 +207,21 @@ function UserDropdown({
       <Button
         variant="ghost"
         size={inline ? 'sm' : 'icon'}
-        className={cn('rounded-full border border-slate-200 px-2', inline && 'pl-2 pr-3')}
+        className={cn(
+          'relative rounded-full border border-slate-200 px-2 text-slate-600 hover:text-slate-900 dark:border-slate-600 dark:text-slate-200 dark:hover:text-white',
+          inline && 'pl-2 pr-3'
+        )}
       >
-        <Avatar className="h-8 w-8 border border-slate-200">
+        <Avatar className="h-8 w-8 border border-slate-200 dark:border-slate-600">
           <AvatarFallback className="text-xs font-semibold">
             {initials}
           </AvatarFallback>
         </Avatar>
-        {inline && <span className="ml-2 text-sm font-medium text-slate-700">{tNav('favorites')}</span>}
+        {inline && (
+          <span className="ml-2 text-sm font-medium text-slate-700 dark:text-slate-200">
+            {tNav('favorites')}
+          </span>
+        )}
       </Button>
     </DropdownMenuTrigger>
   );
@@ -190,8 +229,8 @@ function UserDropdown({
   return (
     <DropdownMenu>
       {trigger}
-      <DropdownMenuContent className="w-48" align="end">
-        <DropdownMenuLabel>{tNav('favorites')}</DropdownMenuLabel>
+      <DropdownMenuContent className="w-52" align="end">
+        <DropdownMenuLabel>Account</DropdownMenuLabel>
         <DropdownMenuItem asChild>
           <Link href={`/${locale}/favorites`}>{tNav('favorites')}</Link>
         </DropdownMenuItem>
@@ -199,7 +238,7 @@ function UserDropdown({
           <Link href={`/${locale}/my-listings`}>{tNav('myListings')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href={`/${locale}/alerts`}>{tNav('alerts')}</Link>
+          <Link href={`/${locale}/favorites?tab=alerts`}>{tNav('alerts')}</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-rose-600">

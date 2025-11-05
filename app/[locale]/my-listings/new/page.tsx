@@ -9,7 +9,7 @@ export default async function NewListingPage({
 }: {
   params: { locale: string };
 }) {
-  const { locale } = params;
+  const { locale } = await params;
 
   if (!isLocale(locale)) {
     notFound();

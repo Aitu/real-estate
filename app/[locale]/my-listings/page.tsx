@@ -5,7 +5,6 @@ import { getUser } from '@/lib/db/queries';
 import { redirect, notFound } from 'next/navigation';
 import { fetchOwnerListings } from './actions';
 import { MyListingsManager, type MyListingsCopy } from './my-listings-manager';
-import type { ListingFormCopy } from './listing-form';
 import type { ListingStatus } from '@/lib/types/listing';
 import type { OwnerListingSort } from '@/lib/db/listings';
 
@@ -76,94 +75,6 @@ export default async function MyListingsPage({
     statusOptions.map((option) => [option.value, option.label])
   ) as Record<ListingStatus, string>;
 
-  const formFields = {
-    title: {
-      label: t('form.fields.title.label'),
-      placeholder: t('form.fields.title.placeholder'),
-    },
-    description: {
-      label: t('form.fields.description.label'),
-      placeholder: t('form.fields.description.placeholder'),
-    },
-    propertyType: {
-      label: t('form.fields.propertyType.label'),
-      placeholder: t('form.fields.propertyType.placeholder'),
-    },
-    status: {
-      label: t('form.fields.status.label'),
-    },
-    price: {
-      label: t('form.fields.price.label'),
-      placeholder: t('form.fields.price.placeholder'),
-    },
-    currency: {
-      label: t('form.fields.currency.label'),
-      placeholder: t('form.fields.currency.placeholder'),
-    },
-    city: {
-      label: t('form.fields.city.label'),
-      placeholder: t('form.fields.city.placeholder'),
-    },
-    postalCode: {
-      label: t('form.fields.postalCode.label'),
-      placeholder: t('form.fields.postalCode.placeholder'),
-    },
-    country: {
-      label: t('form.fields.country.label'),
-      placeholder: t('form.fields.country.placeholder'),
-    },
-    street: {
-      label: t('form.fields.street.label'),
-      placeholder: t('form.fields.street.placeholder'),
-    },
-    bedrooms: {
-      label: t('form.fields.bedrooms.label'),
-      placeholder: t('form.fields.bedrooms.placeholder'),
-    },
-    bathrooms: {
-      label: t('form.fields.bathrooms.label'),
-      placeholder: t('form.fields.bathrooms.placeholder'),
-    },
-    area: {
-      label: t('form.fields.area.label'),
-      placeholder: t('form.fields.area.placeholder'),
-    },
-  } as const;
-
-  const transactionCopy = {
-    label: t('form.transaction.label'),
-    sale: t('form.transaction.sale'),
-    rent: t('form.transaction.rent'),
-  };
-
-  const cancelLabel = t('form.buttons.cancel');
-
-  const createFormCopy: ListingFormCopy = {
-    fields: formFields,
-    propertyTypeOptions,
-    statusOptions,
-    transactionType: transactionCopy,
-    buttons: {
-      cancel: cancelLabel,
-      submit: t('form.buttons.create.submit'),
-      submitting: t('form.buttons.create.submitting'),
-    },
-    statusHelp: t('form.statusHelp'),
-  };
-
-  const updateFormCopy: ListingFormCopy = {
-    fields: formFields,
-    propertyTypeOptions,
-    statusOptions,
-    transactionType: transactionCopy,
-    buttons: {
-      cancel: cancelLabel,
-      submit: t('form.buttons.update.submit'),
-      submitting: t('form.buttons.update.submitting'),
-    },
-    statusHelp: t('form.statusHelp'),
-  };
-
   const copy: MyListingsCopy = {
     heading: {
       title: t('heading.title'),
@@ -210,13 +121,11 @@ export default async function MyListingsPage({
         pagination={{
           page,
           pageSize: DEFAULT_PAGE_SIZE,
-          totalCount: listingResult.totalCount,
-        }}
-        sort={sort}
-        copy={copy}
-        createFormCopy={createFormCopy}
-        updateFormCopy={updateFormCopy}
-      />
-    </div>
-  );
+        totalCount: listingResult.totalCount,
+      }}
+      sort={sort}
+      copy={copy}
+    />
+  </div>
+);
 }
