@@ -27,6 +27,8 @@ export function SiteFooter() {
           </div>
         </div>
         <p className="text-xs text-slate-400">
+          Developed with &hearts; in Luxembourg.
+          <br />
           {t('legal', { values: { year: currentYear } })}
         </p>
       </div>
