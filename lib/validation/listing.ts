@@ -1,0 +1,110 @@
+import { z } from 'zod';
+
+export const listingMetadataSchema = z.object({
+  title: z
+    .string({ required_error: 'Title is required' })
+    .trim()
+    .min(3, 'Title must be at least 3 characters')
+    .max(180, 'Title is too long'),
+  slug: z
+    .string()
+    .trim()
+    .min(1, 'Slug is required')
+    .max(160, 'Slug is too long')
+    .optional(),
+  description: z
+    .string()
+    .trim()
+    .max(4000, 'Description is too long')
+    .optional()
+    .nullable(),
+  propertyType: z
+    .string({ required_error: 'Property type is required' })
+    .trim()
+    .min(1, 'Property type is required'),
+  transactionType: z.enum(['sale', 'rent'], {
+    required_error: 'Transaction type is required',
+  }),
+});
+
+const nullableInt = z
+  .number({ invalid_type_error: 'Must be a number' })
+  .int('Value must be an integer')
+  .min(0, 'Value cannot be negative')
+  .max(9999, 'Value is too large')
+  .nullable();
+
+export const listingDetailsSchema = z.object({
+  street: z
+    .string()
+    .trim()
+    .max(180, 'Street is too long')
+    .optional()
+    .nullable(),
+  city: z
+    .string()
+    .trim()
+    .max(100, 'City is too long')
+    .optional(),
+  postalCode: z
+    .string()
+    .trim()
+    .max(12, 'Postal code is too long')
+    .optional(),
+  country: z
+    .string()
+    .trim()
+    .length(2, 'Use the ISO two-letter country code')
+    .optional(),
+  bedrooms: nullableInt.optional(),
+  bathrooms: nullableInt.optional(),
+  parkingSpaces: nullableInt.optional(),
+  area: nullableInt.optional(),
+  lotArea: nullableInt.optional(),
+  yearBuilt: nullableInt.optional(),
+  energyClass: z
+    .string()
+    .trim()
+    .max(5, 'Energy class is too long')
+    .optional()
+    .nullable(),
+  floor: nullableInt.optional(),
+  totalFloors: nullableInt.optional(),
+  latitude: z
+    .number({ invalid_type_error: 'Latitude must be a number' })
+    .min(-90)
+    .max(90)
+    .nullable()
+    .optional(),
+  longitude: z
+    .number({ invalid_type_error: 'Longitude must be a number' })
+    .min(-180)
+    .max(180)
+    .nullable()
+    .optional(),
+});
+
+export const listingPricingSchema = z.object({
+  price: z
+    .number({ invalid_type_error: 'Price must be a number' })
+    .min(0, 'Price cannot be negative'),
+  currency: z
+    .string({ required_error: 'Currency is required' })
+    .trim()
+    .length(3, 'Currency must be a three-letter code'),
+});
+
+export const listingEditorSchema = listingMetadataSchema
+  .extend({
+    slug: listingMetadataSchema.shape.slug,
+    description: listingMetadataSchema.shape.description,
+  })
+  .merge(listingDetailsSchema)
+  .merge(listingPricingSchema);
+
+export type ListingMetadataInput = z.infer<typeof listingMetadataSchema>;
+export type ListingDetailsInput = z.infer<typeof listingDetailsSchema>;
+export type ListingPricingInput = z.infer<typeof listingPricingSchema>;
+export type ListingEditorValues = z.infer<typeof listingEditorSchema>;
+
+export type ListingStep = 'metadata' | 'details' | 'pricing' | 'media' | 'review';

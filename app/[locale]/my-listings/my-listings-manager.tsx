@@ -1,29 +1,15 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState } from 'react';
+import type { ChangeEvent } from 'react';
+import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import type { OwnerListing, ListingStatus } from '@/lib/types/listing';
-import { ListingForm, type ListingFormCopy, type ListingFormValues } from './listing-form';
-import { createListing, updateListing, deactivateListing } from './actions';
+import { deactivateListing } from './actions';
 import type { ActionState } from '@/lib/auth/middleware';
 import type { OwnerListingSort } from '@/lib/db/listings';
-import type { ListingFormState } from './actions';
 import { useFormStatus } from 'react-dom';
-
-const submitCreateListing = async (
-  state: ListingFormState,
-  formData: FormData
-) => {
-  return (await createListing(state, formData)) as ListingFormState;
-};
-
-const submitUpdateListing = async (
-  state: ListingFormState,
-  formData: FormData
-) => {
-  return (await updateListing(state, formData)) as ListingFormState;
-};
 
 const STATUS_BADGE_STYLES: Record<ListingStatus, string> = {
   draft: 'bg-amber-100 text-amber-700 border-amber-200',
@@ -67,8 +53,6 @@ type MyListingsManagerProps = {
   pagination: { page: number; pageSize: number; totalCount: number };
   sort: OwnerListingSort;
   copy: MyListingsCopy;
-  createFormCopy: ListingFormCopy;
-  updateFormCopy: ListingFormCopy;
 };
 
 function formatCurrency(locale: string, currency: string, value: number) {
@@ -88,25 +72,6 @@ function formatDate(locale: string, value: string) {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(date);
-}
-
-function toFormValues(listing: OwnerListing): ListingFormValues {
-  return {
-    title: listing.title,
-    description: listing.description,
-    propertyType: listing.propertyType,
-    transactionType: listing.transactionType,
-    status: listing.status,
-    price: listing.price,
-    currency: listing.currency,
-    city: listing.city,
-    postalCode: listing.postalCode,
-    country: listing.country,
-    street: listing.street,
-    bedrooms: listing.bedrooms,
-    bathrooms: listing.bathrooms,
-    area: listing.area,
-  };
 }
 
 function replaceSummary(template: string, values: Record<string, number>) {
@@ -170,11 +135,7 @@ export function MyListingsManager({
   pagination,
   sort,
   copy,
-  createFormCopy,
-  updateFormCopy,
 }: MyListingsManagerProps) {
-  const [showCreate, setShowCreate] = useState(listings.length === 0);
-  const [editingId, setEditingId] = useState<number | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -201,7 +162,7 @@ export function MyListingsManager({
     router.push(`${basePath}?${params.toString()}`);
   };
 
-  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSortChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value as OwnerListingSort;
     updateQuery(1, value);
   };
@@ -236,23 +197,11 @@ export function MyListingsManager({
                 </option>
               ))}
             </select>
-            <Button onClick={() => setShowCreate((value) => !value)} variant="default">
-              {copy.createButton}
+            <Button asChild variant="default">
+              <Link href={`/${locale}/my-listings/new`}>{copy.createButton}</Link>
             </Button>
           </div>
         </div>
-
-        {showCreate ? (
-          <ListingForm
-            key="create"
-            action={submitCreateListing}
-            locale={locale}
-            copy={createFormCopy}
-            showStatus
-            onCancel={() => setShowCreate(false)}
-            onSuccess={() => setShowCreate(false)}
-          />
-        ) : null}
       </section>
 
       <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
@@ -290,73 +239,48 @@ export function MyListingsManager({
                 const propertyTypeLabel =
                   copy.propertyTypeLabels[listing.propertyType] ?? listing.propertyType;
                 return (
-                  <>
-                    <tr key={listing.id}>
-                      <td className="px-4 py-4 align-top">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-sm font-semibold text-slate-900">
-                            {listing.title}
-                          </span>
-                          <span className="text-xs uppercase tracking-wide text-slate-500">
-                            {propertyTypeLabel}
-                          </span>
-                          <span className="text-xs text-slate-500">
-                            {[listing.city, listing.country].filter(Boolean).join(', ')}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 align-top">
-                        <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${badgeClass}`}>
-                          {statusLabel}
+                  <tr key={listing.id}>
+                    <td className="px-4 py-4 align-top">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-semibold text-slate-900">
+                          {listing.title}
                         </span>
-                      </td>
-                      <td className="px-4 py-4 align-top text-sm font-medium text-slate-900">
-                        {formatCurrency(locale, listing.currency, listing.price)}
-                      </td>
-                      <td className="px-4 py-4 align-top text-xs text-slate-500">
-                        {formatDate(locale, listing.updatedAt)}
-                      </td>
-                      <td className="px-4 py-4 align-top text-right text-sm">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              setEditingId((current) =>
-                                current === listing.id ? null : listing.id
-                              )
-                            }
-                          >
+                        <span className="text-xs uppercase tracking-wide text-slate-500">
+                          {propertyTypeLabel}
+                        </span>
+                        <span className="text-xs text-slate-500">
+                          {[listing.city, listing.country].filter(Boolean).join(', ')}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 align-top">
+                      <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${badgeClass}`}>
+                        {statusLabel}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 align-top text-sm font-medium text-slate-900">
+                      {formatCurrency(locale, listing.currency, listing.price)}
+                    </td>
+                    <td className="px-4 py-4 align-top text-xs text-slate-500">
+                      {formatDate(locale, listing.updatedAt)}
+                    </td>
+                    <td className="px-4 py-4 align-top text-right text-sm">
+                      <div className="flex justify-end gap-2">
+                        <Button asChild size="sm" variant="outline">
+                          <Link href={`/${locale}/my-listings/${listing.id}`}>
                             {copy.table.edit}
-                          </Button>
-                          <DeactivateListingForm
-                            listingId={listing.id}
-                            locale={locale}
-                            label={copy.table.deactivate}
-                            pendingLabel={copy.table.deactivatePending}
-                            confirmMessage={copy.table.confirmDeactivate}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                    {editingId === listing.id ? (
-                      <tr>
-                        <td colSpan={5} className="bg-slate-50 px-4 py-6">
-                          <ListingForm
-                            key={`edit-${listing.id}`}
-                            action={submitUpdateListing}
-                            locale={locale}
-                            copy={updateFormCopy}
-                            listingId={listing.id}
-                            initialValues={toFormValues(listing)}
-                            showStatus
-                            onCancel={() => setEditingId(null)}
-                            onSuccess={() => setEditingId(null)}
-                          />
-                        </td>
-                      </tr>
-                    ) : null}
-                  </>
+                          </Link>
+                        </Button>
+                        <DeactivateListingForm
+                          listingId={listing.id}
+                          locale={locale}
+                          label={copy.table.deactivate}
+                          pendingLabel={copy.table.deactivatePending}
+                          confirmMessage={copy.table.confirmDeactivate}
+                        />
+                      </div>
+                    </td>
+                  </tr>
                 );
               })
             )}
