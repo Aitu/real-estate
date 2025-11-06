@@ -12,6 +12,86 @@
     "alerts": "Alerts",
     "logout": "Log out"
   },
+  "alertsPage": {
+    "title": "Saved alerts",
+    "subtitle": "Create targeted alerts to stay informed about new listings that match your budget and preferred areas.",
+    "createButton": "New alert",
+    "empty": {
+      "title": "You're not tracking any alerts yet",
+      "description": "Save a search alert to get notified as soon as new properties hit the market."
+    },
+    "transactions": {
+      "sale": "For sale",
+      "rent": "For rent"
+    },
+    "list": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleting": "Deleting…",
+      "confirmDelete": "Delete \"{title}\"?",
+      "filters": {
+        "transaction": "Transaction",
+        "propertyType": "Property type",
+        "location": "Location"
+      },
+      "channelsHeading": "Notifications"
+    },
+    "filters": {
+      "budgetRange": "{min} – {max}",
+      "budgetMin": "From {value}",
+      "budgetMax": "Up to {value}",
+      "budgetAny": "Any budget",
+      "propertyTypeAny": "Any property type",
+      "locationAny": "Anywhere",
+      "locationWithRadius": "{city} · within {radius} km",
+      "radiusOnly": "Within {radius} km"
+    },
+    "form": {
+      "createTitle": "Create alert",
+      "editTitle": "Edit alert",
+      "nameLabel": "Alert name",
+      "namePlaceholder": "Luxembourg city apartments",
+      "transactionLabel": "Transaction type",
+      "transactionSale": "For sale",
+      "transactionRent": "For rent",
+      "propertyTypeLabel": "Property type",
+      "propertyTypeAny": "Any property type",
+      "propertyType": {
+        "apartment": "Apartment",
+        "house": "House",
+        "duplex": "Duplex",
+        "penthouse": "Penthouse",
+        "office": "Office",
+        "land": "Land"
+      },
+      "minBudgetLabel": "Minimum budget",
+      "maxBudgetLabel": "Maximum budget",
+      "locationLabel": "Location keyword",
+      "locationPlaceholder": "City, commune, or neighbourhood",
+      "radiusLabel": "Radius (km)",
+      "notificationsLabel": "Notification channels",
+      "email": "Email",
+      "emailDescription": "We'll send new matches straight to your inbox.",
+      "push": "Push notifications (coming soon)",
+      "pushDescription": "Enable push alerts to stay in the loop on mobile when it's ready.",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "createAction": "Create alert",
+      "updateAction": "Save changes"
+    },
+    "feedback": {
+      "created": "Alert created successfully.",
+      "updated": "Alert updated successfully.",
+      "deleted": "Alert deleted.",
+      "titleRequired": "Give your alert a name.",
+      "invalidTransaction": "Select a valid transaction type.",
+      "invalidBudget": "Enter whole numbers for the budget filters.",
+      "minGreaterThanMax": "The minimum budget cannot be higher than the maximum budget.",
+      "invalidRadius": "Radius must be a whole number.",
+      "notFound": "We couldn't find that alert anymore.",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
   "hero": {
     "title": "Find your place in Luxembourg",
     "subtitle": "Search curated listings across the Grand Duchy with live pricing and map discovery.",

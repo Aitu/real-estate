@@ -634,6 +634,7 @@ export function ListingWizard({
                       <Textarea
                         placeholder="Describe the property, its surroundings, and standout amenities."
                         {...field}
+                        value={field.value ?? ''}
                       />
                     </FormControl>
                     <FormMessage />

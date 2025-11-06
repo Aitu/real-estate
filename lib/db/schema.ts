@@ -143,6 +143,8 @@ export const alerts = pgTable(
     city: varchar('city', { length: 100 }),
     postalCodes: varchar('postal_codes', { length: 100 }),
     radiusKm: integer('radius_km'),
+    notifyEmail: boolean('notify_email').notNull().default(true),
+    notifyPush: boolean('notify_push').notNull().default(false),
     frequency: varchar('frequency', { length: 20 }).default('instant'),
     lastTriggeredAt: timestamp('last_triggered_at'),
     createdAt: timestamp('created_at').notNull().defaultNow(),

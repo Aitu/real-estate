@@ -12,6 +12,86 @@
     "alerts": "Benachrichtigungen",
     "logout": "Abmelden"
   },
+  "alertsPage": {
+    "title": "Gespeicherte Benachrichtigungen",
+    "subtitle": "Erstellen Sie gezielte Benachrichtigungen, um neue Inserate zu verfolgen, die zu Ihrem Budget und Ihren Wunschlagen passen.",
+    "createButton": "Neue Benachrichtigung",
+    "empty": {
+      "title": "Sie haben noch keine Benachrichtigungen",
+      "description": "Speichern Sie eine Suchbenachrichtigung, um sofort über neue Inserate informiert zu werden."
+    },
+    "transactions": {
+      "sale": "Zum Verkauf",
+      "rent": "Zur Miete"
+    },
+    "list": {
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "deleting": "Wird gelöscht…",
+      "confirmDelete": "„{title}“ löschen?",
+      "filters": {
+        "transaction": "Transaktion",
+        "propertyType": "Immobilientyp",
+        "location": "Standort"
+      },
+      "channelsHeading": "Benachrichtigungen"
+    },
+    "filters": {
+      "budgetRange": "{min} – {max}",
+      "budgetMin": "Ab {value}",
+      "budgetMax": "Bis {value}",
+      "budgetAny": "Beliebiges Budget",
+      "propertyTypeAny": "Beliebiger Immobilientyp",
+      "locationAny": "Beliebiger Standort",
+      "locationWithRadius": "{city} · im Umkreis von {radius} km",
+      "radiusOnly": "Im Umkreis von {radius} km"
+    },
+    "form": {
+      "createTitle": "Benachrichtigung erstellen",
+      "editTitle": "Benachrichtigung bearbeiten",
+      "nameLabel": "Name der Benachrichtigung",
+      "namePlaceholder": "Wohnungen Luxemburg-Stadt",
+      "transactionLabel": "Transaktionstyp",
+      "transactionSale": "Zum Verkauf",
+      "transactionRent": "Zur Miete",
+      "propertyTypeLabel": "Immobilientyp",
+      "propertyTypeAny": "Beliebiger Immobilientyp",
+      "propertyType": {
+        "apartment": "Wohnung",
+        "house": "Haus",
+        "duplex": "Duplex",
+        "penthouse": "Penthouse",
+        "office": "Büro",
+        "land": "Grundstück"
+      },
+      "minBudgetLabel": "Mindestbudget",
+      "maxBudgetLabel": "Höchstbudget",
+      "locationLabel": "Standort-Suchbegriff",
+      "locationPlaceholder": "Stadt, Gemeinde oder Viertel",
+      "radiusLabel": "Radius (km)",
+      "notificationsLabel": "Benachrichtigungskanäle",
+      "email": "E-Mail",
+      "emailDescription": "Wir senden neue Treffer direkt in Ihr Postfach.",
+      "push": "Push-Benachrichtigungen (bald)",
+      "pushDescription": "Aktivieren Sie Push, um auf dem Handy informiert zu werden, sobald es verfügbar ist.",
+      "cancel": "Abbrechen",
+      "saving": "Speichern…",
+      "createAction": "Benachrichtigung erstellen",
+      "updateAction": "Änderungen speichern"
+    },
+    "feedback": {
+      "created": "Benachrichtigung wurde erstellt.",
+      "updated": "Benachrichtigung wurde aktualisiert.",
+      "deleted": "Benachrichtigung wurde gelöscht.",
+      "titleRequired": "Geben Sie Ihrer Benachrichtigung einen Namen.",
+      "invalidTransaction": "Bitte wählen Sie einen gültigen Transaktionstyp.",
+      "invalidBudget": "Bitte geben Sie ganze Zahlen für das Budget ein.",
+      "minGreaterThanMax": "Das Mindestbudget darf das Höchstbudget nicht überschreiten.",
+      "invalidRadius": "Der Radius muss eine ganze Zahl sein.",
+      "notFound": "Diese Benachrichtigung wurde nicht gefunden.",
+      "unknown": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+    }
+  },
   "hero": {
     "title": "Finden Sie Ihr Zuhause in Luxemburg",
     "subtitle": "Entdecken Sie kuratierte Objekte mit aktuellen Preisen und Kartenansicht.",

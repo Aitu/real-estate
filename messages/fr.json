@@ -12,6 +12,86 @@
     "alerts": "Alertes",
     "logout": "Se déconnecter"
   },
+  "alertsPage": {
+    "title": "Alertes enregistrées",
+    "subtitle": "Créez des alertes ciblées pour suivre les nouvelles annonces correspondant à votre budget et vos quartiers favoris.",
+    "createButton": "Nouvelle alerte",
+    "empty": {
+      "title": "Vous n'avez pas encore d'alerte",
+      "description": "Enregistrez une alerte de recherche pour être averti dès qu'une nouvelle annonce est publiée."
+    },
+    "transactions": {
+      "sale": "À vendre",
+      "rent": "À louer"
+    },
+    "list": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "deleting": "Suppression…",
+      "confirmDelete": "Supprimer \"{title}\" ?",
+      "filters": {
+        "transaction": "Transaction",
+        "propertyType": "Type de bien",
+        "location": "Localisation"
+      },
+      "channelsHeading": "Notifications"
+    },
+    "filters": {
+      "budgetRange": "{min} – {max}",
+      "budgetMin": "À partir de {value}",
+      "budgetMax": "Jusqu'à {value}",
+      "budgetAny": "Budget illimité",
+      "propertyTypeAny": "Tout type de bien",
+      "locationAny": "Partout",
+      "locationWithRadius": "{city} · dans un rayon de {radius} km",
+      "radiusOnly": "Dans un rayon de {radius} km"
+    },
+    "form": {
+      "createTitle": "Créer une alerte",
+      "editTitle": "Modifier l'alerte",
+      "nameLabel": "Nom de l'alerte",
+      "namePlaceholder": "Appartements Luxembourg-ville",
+      "transactionLabel": "Type de transaction",
+      "transactionSale": "À vendre",
+      "transactionRent": "À louer",
+      "propertyTypeLabel": "Type de bien",
+      "propertyTypeAny": "Tout type de bien",
+      "propertyType": {
+        "apartment": "Appartement",
+        "house": "Maison",
+        "duplex": "Duplex",
+        "penthouse": "Penthouse",
+        "office": "Bureau",
+        "land": "Terrain"
+      },
+      "minBudgetLabel": "Budget minimum",
+      "maxBudgetLabel": "Budget maximum",
+      "locationLabel": "Mot-clé de localisation",
+      "locationPlaceholder": "Ville, commune ou quartier",
+      "radiusLabel": "Rayon (km)",
+      "notificationsLabel": "Canaux de notification",
+      "email": "Email",
+      "emailDescription": "Nous vous enverrons les nouvelles annonces par email.",
+      "push": "Notifications push (bientôt)",
+      "pushDescription": "Activez les push pour être averti sur mobile dès que disponible.",
+      "cancel": "Annuler",
+      "saving": "Enregistrement…",
+      "createAction": "Créer l'alerte",
+      "updateAction": "Enregistrer"
+    },
+    "feedback": {
+      "created": "Alerte créée avec succès.",
+      "updated": "Alerte mise à jour.",
+      "deleted": "Alerte supprimée.",
+      "titleRequired": "Donnez un nom à votre alerte.",
+      "invalidTransaction": "Sélectionnez un type de transaction valide.",
+      "invalidBudget": "Saisissez des montants entiers pour le budget.",
+      "minGreaterThanMax": "Le budget minimum ne peut pas dépasser le budget maximum.",
+      "invalidRadius": "Le rayon doit être un nombre entier.",
+      "notFound": "Impossible de retrouver cette alerte.",
+      "unknown": "Une erreur est survenue. Veuillez réessayer."
+    }
+  },
   "hero": {
     "title": "Trouvez votre lieu au Luxembourg",
     "subtitle": "Parcourez des biens sélectionnés avec prix à jour et carte interactive.",

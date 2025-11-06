@@ -200,6 +200,7 @@ async function main() {
   const STRIPE_SECRET_KEY = await getStripeSecretKey();
   const STRIPE_WEBHOOK_SECRET = await createStripeWebhook();
   const BASE_URL = 'http://localhost:3000';
+  const NEXTAUTH_URL = BASE_URL;
   const AUTH_SECRET = generateAuthSecret();
 
   await writeEnvFile({
@@ -207,6 +208,7 @@ async function main() {
     STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET,
     BASE_URL,
+    NEXTAUTH_URL,
     AUTH_SECRET,
   });
 

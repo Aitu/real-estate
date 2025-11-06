@@ -1,10 +1,8 @@
 import { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
-import { headers } from 'next/headers';
 import { I18nProvider } from '@/lib/i18n/provider';
 import { loadMessages } from '@/lib/i18n/get-messages';
 import { isLocale, locales, type Locale } from '@/lib/i18n/config';
-import { SiteHeader } from '@/components/layout/site-header';
 
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
