@@ -1,47 +1,13 @@
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from './drizzle';
 import { alerts, type Alert, type NewAlert } from './schema';
-
-export const PROPERTY_TYPE_OPTIONS = [
-  'apartment',
-  'house',
-  'duplex',
-  'penthouse',
-  'office',
-  'land'
-] as const;
-
-export const TRANSACTION_TYPES = ['sale', 'rent'] as const;
-
-export type PropertyTypeOption = (typeof PROPERTY_TYPE_OPTIONS)[number];
-export type TransactionTypeOption = (typeof TRANSACTION_TYPES)[number];
-
-export type AlertInput = {
-  title: string;
-  transactionType: TransactionTypeOption;
-  propertyType: PropertyTypeOption | null;
-  minBudget: number | null;
-  maxBudget: number | null;
-  city: string | null;
-  radiusKm: number | null;
-  notifyEmail: boolean;
-  notifyPush: boolean;
-};
-
-export type AlertSummary = {
-  id: number;
-  title: string;
-  transactionType: TransactionTypeOption;
-  propertyType: PropertyTypeOption | null;
-  minBudget: number | null;
-  maxBudget: number | null;
-  city: string | null;
-  radiusKm: number | null;
-  notifyEmail: boolean;
-  notifyPush: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
+import {
+  PROPERTY_TYPE_OPTIONS,
+  type AlertInput,
+  type AlertSummary,
+  type PropertyTypeOption,
+  type TransactionTypeOption
+} from '@/lib/alerts/models';
 
 function normalizePropertyType(value: string | null): PropertyTypeOption | null {
   if (!value) {

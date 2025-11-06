@@ -37,7 +37,7 @@ import {
   type AlertSummary,
   type PropertyTypeOption,
   type TransactionTypeOption
-} from '@/lib/db/alerts';
+} from '@/lib/alerts/models';
 import {
   createAlert,
   updateAlert,

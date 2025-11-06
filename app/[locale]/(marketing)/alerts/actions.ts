@@ -6,13 +6,15 @@ import { z } from 'zod';
 import {
   createAlertForUser,
   deleteAlertForUser,
-  updateAlertForUser,
+  updateAlertForUser
+} from '@/lib/db/alerts';
+import {
   PROPERTY_TYPE_OPTIONS,
   TRANSACTION_TYPES,
   type AlertInput,
   type PropertyTypeOption,
   type TransactionTypeOption
-} from '@/lib/db/alerts';
+} from '@/lib/alerts/models';
 import { validatedActionWithUser, type ActionState } from '@/lib/auth/middleware';
 import { isLocale } from '@/lib/i18n/config';
 
