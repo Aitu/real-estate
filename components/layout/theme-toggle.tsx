@@ -49,10 +49,10 @@ export function ThemeToggle() {
     <Button
       type="button"
       variant="ghost"
-      size="icon"
+      size="sm"
       onClick={toggleMode}
       aria-label={nextLabel}
-      className="relative rounded-full border border-slate-200 bg-white/70 text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
+      className="relative h-8 w-8 rounded-full p-0 text-slate-500 transition hover:bg-slate-900/5 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 dark:text-slate-200 dark:hover:bg-slate-100/10 dark:hover:text-white"
     >
       <SunMedium
         className={cn(

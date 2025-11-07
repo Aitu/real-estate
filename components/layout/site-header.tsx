@@ -117,24 +117,12 @@ export function SiteHeader() {
         </div>
 
         <div className="hidden items-center gap-4 md:flex">
-          <span
-            aria-hidden="true"
-            className="hidden h-6 w-px bg-slate-200/70 dark:bg-slate-800 lg:inline-block"
-          />
-          <div className="flex items-center gap-3 rounded-full border border-slate-200/70 bg-white/70 px-3 py-1.5 shadow-sm backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-900/40">
+          <div className="flex items-center gap-3 text-slate-500 dark:text-slate-300">
             <Suspense fallback={null}>
               <LanguageSwitcher />
             </Suspense>
-            <span
-              aria-hidden="true"
-              className="h-4 w-px bg-slate-200/70 dark:bg-slate-700/70"
-            />
             <ThemeToggle />
           </div>
-          <span
-            aria-hidden="true"
-            className="h-6 w-px bg-slate-200/70 dark:bg-slate-800/70"
-          />
           {user ? (
             <UserDropdown initials={initials} locale={locale} />
           ) : (
@@ -145,10 +133,6 @@ export function SiteHeader() {
               >
                 {tNav('login')}
               </Link>
-              <span
-                aria-hidden="true"
-                className="h-5 w-px bg-slate-200/70 dark:bg-slate-800/70"
-              />
               <Link href={signupPath}>
                 <Button size="sm" className="rounded-full px-4 text-sm font-semibold">
                   {tNav('signup')}

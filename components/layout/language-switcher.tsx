@@ -77,7 +77,7 @@ export function LanguageSwitcher() {
           variant="ghost"
           size="sm"
           className={cn(
-            'group flex items-center gap-1 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white',
+            'group inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-widest text-slate-500 transition hover:bg-slate-900/5 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 dark:text-slate-200 dark:hover:bg-slate-100/10 dark:hover:text-white',
             isPending && 'opacity-60'
           )}
         >
@@ -105,4 +105,3 @@ export function LanguageSwitcher() {
     </DropdownMenu>
   );
 }
-
