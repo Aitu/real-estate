@@ -60,40 +60,40 @@ export function SiteHeader() {
   const signupPath = `/${locale}/signup`;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/90 backdrop-blur dark:border-slate-800/60 dark:bg-slate-950/80">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link
-          href={`/${locale}`}
-          className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100"
-        >
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900">
-            <Building2 className="h-4 w-4" aria-hidden="true" />
-          </span>
-          <span className="hidden text-lg tracking-tight sm:inline">LuxNest</span>
-        </Link>
+    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur dark:border-slate-800/60 dark:bg-slate-950/85">
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-1 items-center gap-6">
+          <Link
+            href={`/${locale}`}
+            className="flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 dark:text-slate-100"
+          >
+            <span className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 bg-slate-900 text-white shadow-sm dark:border-slate-700 dark:bg-slate-100 dark:text-slate-900">
+              <Building2 className="h-4 w-4" aria-hidden="true" />
+            </span>
+            <span className="hidden text-lg tracking-tight sm:inline">LuxNest</span>
+          </Link>
 
-        <nav className="hidden items-center gap-2 md:flex">
-          {NAV_ITEMS.map(({ key, icon: Icon, anchor }) => {
-            const href = `/${locale}${anchor}`;
-            const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
-            const active = isHome;
-            return (
-              <Link
-                key={key}
-                href={href}
-                className={cn(
-                  'group flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-4 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-white',
-                  active && 'border-slate-900/20 text-slate-900 dark:border-slate-500 dark:text-white'
-                )}
-              >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/5 text-slate-700 transition group-hover:bg-slate-900/10 dark:bg-slate-100/10 dark:text-slate-200 dark:group-hover:bg-slate-100/20">
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <span className="tracking-wide">{tNav(key)}</span>
-              </Link>
-            );
-          })}
-        </nav>
+          <nav className="hidden items-center gap-1 md:flex">
+            {NAV_ITEMS.map(({ key, anchor }) => {
+              const href = `/${locale}${anchor}`;
+              const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
+              const active = isHome && key === 'buy';
+              return (
+                <Link
+                  key={key}
+                  href={href}
+                  className={cn(
+                    'group relative inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold tracking-tight text-slate-500 transition duration-200 ease-out hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 dark:text-slate-300 dark:hover:text-white',
+                    'after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[1.5px] after:origin-center after:scale-x-0 after:bg-slate-900/70 after:opacity-0 after:transition-all after:duration-300 after:ease-out group-hover:after:scale-x-100 group-hover:after:opacity-100 dark:after:bg-slate-100/70',
+                    active && 'text-slate-900 after:scale-x-100 after:opacity-100 dark:text-white'
+                  )}
+                >
+                  {tNav(key)}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
@@ -116,27 +116,45 @@ export function SiteHeader() {
           </Button>
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <Suspense fallback={null}>
-            <LanguageSwitcher />
-          </Suspense>
-          <ThemeToggle />
+        <div className="hidden items-center gap-4 md:flex">
+          <span
+            aria-hidden="true"
+            className="hidden h-6 w-px bg-slate-200/70 dark:bg-slate-800 lg:inline-block"
+          />
+          <div className="flex items-center gap-3 rounded-full border border-slate-200/70 bg-white/70 px-3 py-1.5 shadow-sm backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-900/40">
+            <Suspense fallback={null}>
+              <LanguageSwitcher />
+            </Suspense>
+            <span
+              aria-hidden="true"
+              className="h-4 w-px bg-slate-200/70 dark:bg-slate-700/70"
+            />
+            <ThemeToggle />
+          </div>
+          <span
+            aria-hidden="true"
+            className="h-6 w-px bg-slate-200/70 dark:bg-slate-800/70"
+          />
           {user ? (
             <UserDropdown initials={initials} locale={locale} />
           ) : (
-            <>
+            <div className="flex items-center gap-3">
               <Link
                 href={loginPath}
-                className="text-sm font-medium text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                className="text-sm font-semibold text-slate-600 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
               >
                 {tNav('login')}
               </Link>
+              <span
+                aria-hidden="true"
+                className="h-5 w-px bg-slate-200/70 dark:bg-slate-800/70"
+              />
               <Link href={signupPath}>
-                <Button size="sm" className="rounded-full px-4 text-sm">
+                <Button size="sm" className="rounded-full px-4 text-sm font-semibold">
                   {tNav('signup')}
                 </Button>
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>
