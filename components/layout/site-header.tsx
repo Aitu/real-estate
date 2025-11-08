@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useMemo, useState, type MouseEvent } from 'react';
 import {
   BadgeDollarSign,
   Building2,
@@ -11,7 +11,7 @@ import {
   UserRound,
   X
 } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +39,7 @@ export function SiteHeader() {
   const tNav = useTranslations('navigation');
   const { locale } = useI18n();
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useCurrentUser();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -58,6 +59,19 @@ export function SiteHeader() {
 
   const loginPath = `/${locale}/login`;
   const signupPath = `/${locale}/signup`;
+  const listingWizardPath = `/${locale}/my-listings/new`;
+  const sellLoginRedirect = `${loginPath}?callbackUrl=${encodeURIComponent(listingWizardPath)}`;
+  const sellNavHref = user ? listingWizardPath : sellLoginRedirect;
+
+  const handleNavClick = (key: (typeof NAV_ITEMS)[number]['key']) => (event: MouseEvent<HTMLAnchorElement>) => {
+    if (key !== 'sell') {
+      return;
+    }
+
+    event.preventDefault();
+    router.push(sellNavHref);
+    setMenuOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur dark:border-slate-800/60 dark:bg-slate-950/85">
@@ -75,9 +89,10 @@ export function SiteHeader() {
 
           <nav className="hidden items-center gap-1 md:flex">
             {NAV_ITEMS.map(({ key, anchor }) => {
-              const href = `/${locale}${anchor}`;
+              const href = key === 'sell' ? sellNavHref : `/${locale}${anchor}`;
               const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
-              const active = isHome && key === 'buy';
+              const isSellWizard = pathname.startsWith(listingWizardPath);
+              const active = (isHome && key === 'buy') || (isSellWizard && key === 'sell');
               return (
                 <Link
                   key={key}
@@ -87,6 +102,7 @@ export function SiteHeader() {
                     'after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[1.5px] after:origin-center after:scale-x-0 after:bg-slate-900/70 after:opacity-0 after:transition-all after:duration-300 after:ease-out group-hover:after:scale-x-100 group-hover:after:opacity-100 dark:after:bg-slate-100/70',
                     active && 'text-slate-900 after:scale-x-100 after:opacity-100 dark:text-white'
                   )}
+                  onClick={handleNavClick(key)}
                 >
                   {tNav(key)}
                 </Link>
@@ -146,19 +162,33 @@ export function SiteHeader() {
       {menuOpen && (
         <div className="border-t border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950 md:hidden">
           <nav className="flex flex-col gap-3 px-4 py-4">
-            {NAV_ITEMS.map(({ key, icon: Icon, anchor }) => (
-              <Link
-                key={key}
-                href={`/${locale}${anchor}`}
-                className="flex items-center gap-3 rounded-2xl border border-slate-200/70 px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-900"
-                onClick={() => setMenuOpen(false)}
-              >
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900/5 text-slate-700 dark:bg-slate-100/10 dark:text-slate-100">
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <span>{tNav(key)}</span>
-              </Link>
-            ))}
+            {NAV_ITEMS.map(({ key, icon: Icon, anchor }) => {
+              const href = key === 'sell' ? sellNavHref : `/${locale}${anchor}`;
+              const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
+              const isSellWizard = pathname.startsWith(listingWizardPath);
+              const active = (isHome && key === 'buy') || (isSellWizard && key === 'sell');
+              return (
+                <Link
+                  key={key}
+                  href={href}
+                  className={cn(
+                    'flex items-center gap-3 rounded-2xl border border-slate-200/70 px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-900',
+                    active && 'border-slate-900/20 bg-slate-100 dark:border-slate-500/60 dark:bg-slate-900'
+                  )}
+                  onClick={(event) => {
+                    handleNavClick(key)(event);
+                    if (key !== 'sell') {
+                      setMenuOpen(false);
+                    }
+                  }}
+                >
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900/5 text-slate-700 dark:bg-slate-100/10 dark:text-slate-100">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <span>{tNav(key)}</span>
+                </Link>
+              );
+            })}
             <div className="flex items-center justify-between px-3">
               <Suspense fallback={null}>
                 <LanguageSwitcher />

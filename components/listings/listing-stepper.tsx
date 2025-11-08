@@ -1,14 +1,11 @@
 'use client';
 
 import { Check } from 'lucide-react';
+import type { ListingStepDefinition } from '@/lib/listings/step-definitions';
 import { ListingStep } from '@/lib/validation/listing';
 import { cn } from '@/lib/utils';
 
-export type ListingStepperStep = {
-  id: ListingStep;
-  title: string;
-  description?: string;
-};
+export type ListingStepperStep = ListingStepDefinition;
 
 interface ListingStepperProps {
   steps: ListingStepperStep[];

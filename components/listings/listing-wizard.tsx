@@ -12,7 +12,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Upload, Trash2, ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
 
-import { ListingStepper, ListingStepperStep } from './listing-stepper';
+import { ListingStepper } from './listing-stepper';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,7 @@ import {
   uploadListingMediaAction,
 } from '@/app/[locale]/(marketing)/my-listings/actions';
 import type { Locale } from '@/lib/i18n/config';
+import { LISTING_STEP_DEFINITIONS, LISTING_STEP_IDS } from '@/lib/listings/step-definitions';
 
 type ListingImageItem = {
   id: number;
@@ -57,35 +58,7 @@ const TRANSACTION_TYPES = [
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
-const STEP_DEFINITIONS: ListingStepperStep[] = [
-  {
-    id: 'metadata',
-    title: 'Listing metadata',
-    description: 'Describe the property and choose its type.',
-  },
-  {
-    id: 'details',
-    title: 'Property details',
-    description: 'Provide location and amenity information.',
-  },
-  {
-    id: 'pricing',
-    title: 'Pricing',
-    description: 'Set the pricing details and currency.',
-  },
-  {
-    id: 'media',
-    title: 'Media',
-    description: 'Upload high quality photos to showcase the listing.',
-  },
-  {
-    id: 'review',
-    title: 'Review & publish',
-    description: 'Double-check every section before publishing.',
-  },
-];
-
-const STEP_ORDER: ListingStep[] = STEP_DEFINITIONS.map((step) => step.id);
+const STEP_ORDER: ListingStep[] = [...LISTING_STEP_IDS];
 
 const STEP_FIELDS: Record<ListingStep, Array<keyof ListingEditorValues>> = {
   metadata: ['title', 'slug', 'description', 'propertyType', 'transactionType'],
@@ -522,7 +495,7 @@ export function ListingWizard({
       </div>
 
       <ListingStepper
-        steps={STEP_DEFINITIONS}
+        steps={LISTING_STEP_DEFINITIONS}
         currentStep={currentStep}
         onStepChange={(step) => {
           const targetIndex = STEP_ORDER.indexOf(step);
