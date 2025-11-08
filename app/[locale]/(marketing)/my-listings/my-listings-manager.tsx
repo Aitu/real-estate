@@ -10,12 +10,20 @@ import { deactivateListing } from './actions';
 import type { ActionState } from '@/lib/auth/middleware';
 import type { OwnerListingSort } from '@/lib/db/listings';
 import { useFormStatus } from 'react-dom';
+import { Eye, Loader2, PencilLine, Power } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 const STATUS_BADGE_STYLES: Record<ListingStatus, string> = {
   draft: 'bg-amber-100 text-amber-700 border-amber-200',
   published: 'bg-emerald-100 text-emerald-700 border-emerald-200',
   inactive: 'bg-slate-100 text-slate-600 border-slate-200',
 };
+
+const ACTION_ICON_CLASS =
+  'inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition hover:text-slate-900 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-300';
+
+const ACTION_ICON_DESTRUCTIVE_CLASS =
+  'inline-flex h-8 w-8 items-center justify-center rounded-full text-rose-500 transition hover:text-rose-600 hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-200';
 
 export type MyListingsCopy = {
   heading: { title: string; subtitle: string };
@@ -28,6 +36,7 @@ export type MyListingsCopy = {
       updated: string;
       actions: string;
     };
+    view: string;
     edit: string;
     deactivate: string;
     deactivatePending: string;
@@ -86,12 +95,14 @@ function DeactivateListingForm({
   label,
   pendingLabel,
   confirmMessage,
+  icon,
 }: {
   listingId: number;
   locale: string;
   label: string;
   pendingLabel: string;
   confirmMessage: string;
+  icon: LucideIcon;
 }) {
   const [, formAction] = useActionState<ActionState, FormData>(
     deactivateListing,
@@ -109,7 +120,7 @@ function DeactivateListingForm({
     >
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="listingId" value={listingId} />
-      <DeactivateButton label={label} pendingLabel={pendingLabel} />
+      <DeactivateButton label={label} pendingLabel={pendingLabel} icon={icon} />
     </form>
   );
 }
@@ -117,15 +128,48 @@ function DeactivateListingForm({
 function DeactivateButton({
   label,
   pendingLabel,
+  icon: Icon,
 }: {
   label: string;
   pendingLabel: string;
+  icon: LucideIcon;
 }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" variant="outline" size="sm" disabled={pending}>
-      {pending ? pendingLabel : label}
-    </Button>
+    <button
+      type="submit"
+      aria-label={label}
+      title={pending ? pendingLabel : label}
+      className={`${ACTION_ICON_DESTRUCTIVE_CLASS} ${pending ? 'cursor-not-allowed opacity-60' : ''}`}
+      disabled={pending}
+    >
+      {pending ? (
+        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+      ) : (
+        <Icon className="h-4 w-4" aria-hidden="true" />
+      )}
+    </button>
+  );
+}
+
+function ActionIconLink({
+  href,
+  label,
+  icon: Icon,
+}: {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      title={label}
+      className={ACTION_ICON_CLASS}
+    >
+      <Icon className="h-4 w-4" aria-hidden="true" />
+    </Link>
   );
 }
 
@@ -266,17 +310,23 @@ export function MyListingsManager({
                     </td>
                     <td className="px-4 py-4 align-top text-right text-sm">
                       <div className="flex justify-end gap-2">
-                        <Button asChild size="sm" variant="outline">
-                          <Link href={`/${locale}/my-listings/${listing.id}`}>
-                            {copy.table.edit}
-                          </Link>
-                        </Button>
+                        <ActionIconLink
+                          href={`/${locale}/${listing.id}`}
+                          label={copy.table.view}
+                          icon={Eye}
+                        />
+                        <ActionIconLink
+                          href={`/${locale}/my-listings/${listing.id}`}
+                          label={copy.table.edit}
+                          icon={PencilLine}
+                        />
                         <DeactivateListingForm
                           listingId={listing.id}
                           locale={locale}
                           label={copy.table.deactivate}
                           pendingLabel={copy.table.deactivatePending}
                           confirmMessage={copy.table.confirmDeactivate}
+                          icon={Power}
                         />
                       </div>
                     </td>

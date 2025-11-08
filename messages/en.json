@@ -208,6 +208,7 @@
         "actions": "Actions"
       },
       "actions": {
+        "view": "View listing",
         "edit": "Edit",
         "deactivate": "Deactivate",
         "deactivatePending": "Deactivating…",

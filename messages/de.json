@@ -208,6 +208,7 @@
         "actions": "Aktionen"
       },
       "actions": {
+        "view": "Inserat ansehen",
         "edit": "Bearbeiten",
         "deactivate": "Deaktivieren",
         "deactivatePending": "Deaktivierung…",

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Bath,
@@ -11,6 +12,7 @@ import {
 import type { ListingSummary } from '@/lib/types/listing';
 import { useI18n, useTranslations } from '@/lib/i18n/provider';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface ListingCardProps {
   listing: ListingSummary;
@@ -122,12 +124,14 @@ export function ListingCard({
 
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold text-slate-900">{priceLabel}</span>
-          <button
-            type="button"
-            className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="rounded-full border-slate-200 px-4 text-xs font-semibold uppercase tracking-wide text-slate-600 hover:border-slate-300 hover:text-slate-900"
           >
-            {t('seeMore')}
-          </button>
+            <Link href={`/${locale}/${listing.id}`}>{t('seeMore')}</Link>
+          </Button>
         </div>
       </div>
     </article>

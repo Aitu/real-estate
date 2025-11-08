@@ -89,6 +89,7 @@ export default async function MyListingsPage({
         updated: t('table.headers.updated'),
         actions: t('table.headers.actions'),
       },
+      view: t('table.actions.view'),
       edit: t('table.actions.edit'),
       deactivate: t('table.actions.deactivate'),
       deactivatePending: t('table.actions.deactivatePending'),
