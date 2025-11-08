@@ -18,6 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   ListingEditorValues,
   ListingStep,
@@ -550,17 +551,18 @@ export function ListingWizard({
                     <FormItem>
                       <FormLabel>Property type</FormLabel>
                       <FormControl>
-                        <select
-                          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                          value={field.value}
-                          onChange={field.onChange}
-                        >
-                          {PROPERTY_TYPES.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a property type" />
+                          </SelectTrigger>
+                          <SelectContent align="start">
+                            {PROPERTY_TYPES.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -809,13 +811,14 @@ export function ListingWizard({
                     <FormItem>
                       <FormLabel>Currency</FormLabel>
                       <FormControl>
-                        <select
-                          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                          value={field.value}
-                          onChange={field.onChange}
-                        >
-                          <option value="EUR">EUR</option>
-                        </select>
+                        <Select value={field.value ?? 'EUR'} onValueChange={field.onChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select currency" />
+                          </SelectTrigger>
+                          <SelectContent align="start">
+                            <SelectItem value="EUR">EUR</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
