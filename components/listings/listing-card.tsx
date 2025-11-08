@@ -130,7 +130,7 @@ export function ListingCard({
             size="sm"
             className="rounded-full border-slate-200 px-4 text-xs font-semibold uppercase tracking-wide text-slate-600 hover:border-slate-300 hover:text-slate-900"
           >
-            <Link href={`/${locale}/${listing.id}`}>{t('seeMore')}</Link>
+            <Link href={`/${locale}/listings/${listing.id}`}>{t('seeMore')}</Link>
           </Button>
         </div>
       </div>

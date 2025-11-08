@@ -128,6 +128,44 @@
     "baths": "{count} sd",
     "seeMore": "Voir l'annonce"
   },
+  "listingsDirectory": {
+    "title": "Explorer toutes les annonces",
+    "subtitle": "Filtrez par transaction, prix et caractéristiques pour trouver le bon bien.",
+    "search": {
+      "placeholder": "Rechercher par mot-clé ou localisation",
+      "button": "Rechercher"
+    },
+    "filters": {
+      "title": "Filtres",
+      "transaction": "Transaction",
+      "transactionAll": "Toutes les transactions",
+      "propertyType": "Type de bien",
+      "propertyTypeAll": "Tous les biens",
+      "priceMin": "Prix min",
+      "priceMax": "Prix max",
+      "bedrooms": "Chambres",
+      "bathrooms": "Salles d'eau",
+      "apply": "Appliquer",
+      "reset": "Réinitialiser",
+      "mobileToggle": "Filtres"
+    },
+    "table": {
+      "headers": {
+        "property": "Bien",
+        "location": "Localisation",
+        "price": "Prix",
+        "beds": "Ch",
+        "baths": "SdB",
+        "area": "Surface"
+      },
+      "empty": "Aucune annonce ne correspond à vos filtres."
+    },
+    "pagination": {
+      "pageCounter": "Page {page} sur {pages}",
+      "previous": "Précédent",
+      "next": "Suivant"
+    }
+  },
   "listingDetail": {
     "price": "{price}",
     "pricePerMonth": "{price} /mois",

@@ -128,6 +128,44 @@
     "baths": "{count} Bad",
     "seeMore": "Details ansehen"
   },
+  "listingsDirectory": {
+    "title": "Alle Inserate entdecken",
+    "subtitle": "Filtern Sie nach Transaktion, Preis und Details, um das passende Objekt zu finden.",
+    "search": {
+      "placeholder": "Nach Stichwort oder Ort suchen",
+      "button": "Suchen"
+    },
+    "filters": {
+      "title": "Filter",
+      "transaction": "Transaktion",
+      "transactionAll": "Alle Transaktionen",
+      "propertyType": "Objekttyp",
+      "propertyTypeAll": "Alle Objekte",
+      "priceMin": "Mindestpreis",
+      "priceMax": "Höchstpreis",
+      "bedrooms": "Schlafzimmer",
+      "bathrooms": "Badezimmer",
+      "apply": "Filter anwenden",
+      "reset": "Zurücksetzen",
+      "mobileToggle": "Filter"
+    },
+    "table": {
+      "headers": {
+        "property": "Objekt",
+        "location": "Ort",
+        "price": "Preis",
+        "beds": "SZ",
+        "baths": "BZ",
+        "area": "Fläche"
+      },
+      "empty": "Keine Inserate entsprechen den Filtern."
+    },
+    "pagination": {
+      "pageCounter": "Seite {page} von {pages}",
+      "previous": "Zurück",
+      "next": "Weiter"
+    }
+  },
   "listingDetail": {
     "price": "{price}",
     "pricePerMonth": "{price} /Monat",

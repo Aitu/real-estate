@@ -15,7 +15,7 @@ export function SiteFooter() {
             {t('tagline')}
           </div>
           <div className="flex gap-4 text-sm text-slate-500">
-            <Link href="#listings" className="hover:text-slate-900">
+            <Link href="/listings" className="hover:text-slate-900">
               Listings
             </Link>
             <Link href="#search" className="hover:text-slate-900">

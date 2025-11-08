@@ -16,7 +16,7 @@ export async function generateMetadata({
 }: {
   params: { locale: string; id: string };
 }): Promise<Metadata> {
-  const { locale: localeParam, id } = params;
+  const { locale: localeParam, id } = await params;
 
   if (!isLocale(localeParam)) {
     return {};
@@ -57,7 +57,7 @@ export default async function ListingDetailPage({
 }: {
   params: { locale: string; id: string };
 }) {
-  const { locale: localeParam, id } = params;
+  const { locale: localeParam, id } = await params;
 
   if (!isLocale(localeParam)) {
     notFound();
@@ -260,7 +260,7 @@ export default async function ListingDetailPage({
               {t('mapHeading')}
             </h2>
             {listing.location.coordinates.lat != null &&
-            listing.location.coordinates.lng != null ? (
+              listing.location.coordinates.lng != null ? (
               <ListingMap
                 title={listing.title}
                 priceLabel={priceLabel}

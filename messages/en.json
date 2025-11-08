@@ -128,6 +128,44 @@
     "baths": "{count} ba",
     "seeMore": "View details"
   },
+  "listingsDirectory": {
+    "title": "Explore all listings",
+    "subtitle": "Filter by transaction type, price range, and property details to find the right place.",
+    "search": {
+      "placeholder": "Search by keyword or location",
+      "button": "Search"
+    },
+    "filters": {
+      "title": "Filters",
+      "transaction": "Transaction",
+      "transactionAll": "Any transaction",
+      "propertyType": "Property type",
+      "propertyTypeAll": "Any property type",
+      "priceMin": "Min price",
+      "priceMax": "Max price",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "apply": "Apply filters",
+      "reset": "Reset",
+      "mobileToggle": "Filters"
+    },
+    "table": {
+      "headers": {
+        "property": "Property",
+        "location": "Location",
+        "price": "Price",
+        "beds": "Beds",
+        "baths": "Baths",
+        "area": "Area"
+      },
+      "empty": "No listings match your filters."
+    },
+    "pagination": {
+      "pageCounter": "Page {page} of {pages}",
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
   "listingDetail": {
     "price": "{price}",
     "pricePerMonth": "{price} /mo",
