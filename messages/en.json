@@ -149,6 +149,10 @@
       "reset": "Reset",
       "mobileToggle": "Filters"
     },
+    "card": {
+      "favorite": "Save listing",
+      "favoriteSelected": "Remove from favorites"
+    },
     "table": {
       "headers": {
         "property": "Property",

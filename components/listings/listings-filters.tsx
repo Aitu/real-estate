@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { SlidersHorizontal } from 'lucide-react';
+import { ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type Option = {
@@ -36,6 +36,7 @@ export function ListingsFilters({
   const pathname = usePathname();
   const params = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(true);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -75,24 +76,35 @@ export function ListingsFilters({
     baths: params.get('baths') ?? '',
   };
 
+  const drawerClasses = cn(
+    'space-y-5 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300',
+    mobileOpen ? 'block' : 'hidden lg:block',
+    drawerOpen ? 'lg:translate-x-0 lg:opacity-100' : 'lg:-translate-x-[110%] lg:opacity-0 lg:pointer-events-none'
+  );
+
   return (
-    <div className="lg:sticky lg:top-6">
+    <div className="relative lg:sticky lg:top-6 lg:pr-10">
+      <div className="flex items-center justify-between gap-3 lg:hidden">
+        <button
+          type="button"
+          className="mb-4 inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+          onClick={() => setMobileOpen((prev) => !prev)}
+          aria-expanded={mobileOpen}
+        >
+          <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+          {copy.mobileToggle}
+        </button>
+      </div>
       <button
         type="button"
-        className="mb-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 lg:hidden"
-        onClick={() => setMobileOpen((prev) => !prev)}
-        aria-expanded={mobileOpen}
+        onClick={() => setDrawerOpen((prev) => !prev)}
+        className="hidden lg:flex absolute left-[calc(100%+0.5rem)] top-4 items-center justify-center rounded-full border border-slate-200 bg-white p-2 text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-300"
+        aria-label={drawerOpen ? 'Hide filters' : 'Show filters'}
+        aria-expanded={drawerOpen}
       >
-        <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
-        {copy.mobileToggle}
+        {drawerOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
       </button>
-      <form
-        onSubmit={handleSubmit}
-        className={cn(
-          'space-y-5 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm',
-          mobileOpen ? 'block' : 'hidden lg:block'
-        )}
-      >
+      <form onSubmit={handleSubmit} className={drawerClasses}>
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-slate-900">{copy.title}</h2>
           <button

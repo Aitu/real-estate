@@ -149,6 +149,10 @@
       "reset": "Zurücksetzen",
       "mobileToggle": "Filter"
     },
+    "card": {
+      "favorite": "Inserat speichern",
+      "favoriteSelected": "Aus Favoriten entfernen"
+    },
     "table": {
       "headers": {
         "property": "Objekt",

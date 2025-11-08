@@ -149,6 +149,10 @@
       "reset": "Réinitialiser",
       "mobileToggle": "Filtres"
     },
+    "card": {
+      "favorite": "Ajouter aux favoris",
+      "favoriteSelected": "Retirer des favoris"
+    },
     "table": {
       "headers": {
         "property": "Bien",

@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getFeaturedListings } from '@/lib/data/listings';
 import { ListingsSearchBar } from '@/components/listings/listings-search-bar';
 import { ListingsFilters } from '@/components/listings/listings-filters';
-import { ListingsTable } from '@/components/listings/listings-table';
+import { ListingsResults } from '@/components/listings/listings-results';
 import { isLocale, type Locale } from '@/lib/i18n/config';
 import { loadMessages } from '@/lib/i18n/get-messages';
 import { getTranslator } from '@/lib/i18n/server';
@@ -34,6 +34,7 @@ export default async function ListingsDirectoryPage({
 
   const tDirectory = getTranslator(locale as Locale, messages, 'listingsDirectory');
   const tMyListings = getTranslator(locale as Locale, messages, 'myListings');
+  const tListings = getTranslator(locale as Locale, messages, 'listings');
 
   const normalizedParams = normalizeParams(resolvedSearchParams);
   const filters = parseFilters(normalizedParams);
@@ -59,8 +60,8 @@ export default async function ListingsDirectoryPage({
       type === 'all'
         ? tDirectory('filters.transactionAll')
         : type === 'sale'
-        ? tMyListings('form.transaction.sale')
-        : tMyListings('form.transaction.rent'),
+          ? tMyListings('form.transaction.sale')
+          : tMyListings('form.transaction.rent'),
   }));
 
   const paginationSummary = tDirectory('pagination.pageCounter', {
@@ -89,25 +90,21 @@ export default async function ListingsDirectoryPage({
     mobileToggle: tDirectory('filters.mobileToggle'),
   };
 
-  const tableCopy = {
-    headers: {
-      property: tDirectory('table.headers.property'),
-      location: tDirectory('table.headers.location'),
-      price: tDirectory('table.headers.price'),
+  const resultsCopy = {
+    favorite: tDirectory('card.favorite'),
+    favoriteSelected: tDirectory('card.favoriteSelected'),
+    view: tListings('seeMore'),
+    stats: {
       beds: tDirectory('table.headers.beds'),
       baths: tDirectory('table.headers.baths'),
       area: tDirectory('table.headers.area'),
     },
-    empty: tDirectory('table.empty'),
   };
 
   return (
     <main className="bg-slate-50">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <header className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-wide text-orange-600">
-            LuxNest
-          </p>
           <h1 className="text-3xl font-semibold text-slate-900">
             {tDirectory('title')}
           </h1>
@@ -127,10 +124,11 @@ export default async function ListingsDirectoryPage({
             propertyTypes={propertyTypeOptions}
             transactionTypes={transactionOptions}
           />
-          <ListingsTable
+          <ListingsResults
             locale={locale}
             listings={paginatedListings}
-            copy={tableCopy}
+            copy={resultsCopy}
+            emptyMessage={tDirectory('table.empty')}
             pagination={{
               summary: paginationSummary,
               previousLabel: tDirectory('pagination.previous'),

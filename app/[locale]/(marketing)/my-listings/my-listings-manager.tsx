@@ -311,7 +311,7 @@ export function MyListingsManager({
                     <td className="px-4 py-4 align-top text-right text-sm">
                       <div className="flex justify-end gap-2">
                         <ActionIconLink
-                          href={`/${locale}/${listing.id}`}
+                          href={`/${locale}/listings/${listing.id}`}
                           label={copy.table.view}
                           icon={Eye}
                         />
