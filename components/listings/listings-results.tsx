@@ -7,6 +7,7 @@ import { Bath, BedDouble, ChevronLeft, ChevronRight, Heart, MapPin, Ruler } from
 import { Button } from '@/components/ui/button';
 import type { ListingSummary } from '@/lib/types/listing';
 import { cn } from '@/lib/utils';
+import { useListingFavorites } from '@/hooks/use-listing-favorites';
 
 type ListingsResultsProps = {
   locale: string;
@@ -38,20 +39,8 @@ export function ListingsResults({
   emptyMessage,
   pagination,
 }: ListingsResultsProps) {
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const { favorites, toggleFavorite } = useListingFavorites({ locale });
   const [activeSlides, setActiveSlides] = useState<Record<string, number>>({});
-
-  const toggleFavorite = (listingId: string) => {
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(listingId)) {
-        next.delete(listingId);
-      } else {
-        next.add(listingId);
-      }
-      return next;
-    });
-  };
 
   const changeSlide = (listingId: string, delta: number, length: number) => {
     setActiveSlides((prev) => {
@@ -188,7 +177,7 @@ export function ListingsResults({
                     {listing.highlights?.slice(0, 2).join(' • ')}
                   </div>
                   <Button asChild className="rounded-full px-6">
-                    <Link href={`/${locale}/listings/${listing.id}`}>{copy.view}</Link>
+                    <Link href={`/${locale}/${listing.id}`}>{copy.view}</Link>
                   </Button>
                 </div>
               </div>

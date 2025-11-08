@@ -19,13 +19,17 @@ interface ListingCardProps {
   isFavorite: boolean;
   onToggleFavorite: (listingId: string) => void;
   isFavoriteDisabled?: boolean;
+  favoriteLabel?: string;
+  favoriteSelectedLabel?: string;
 }
 
 export function ListingCard({
   listing,
   isFavorite,
   onToggleFavorite,
-  isFavoriteDisabled = false
+  isFavoriteDisabled = false,
+  favoriteLabel = 'Save listing',
+  favoriteSelectedLabel = 'Remove from favorites'
 }: ListingCardProps) {
   const t = useTranslations('listings');
   const { locale } = useI18n();
@@ -79,6 +83,7 @@ export function ListingCard({
             'absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-md backdrop-blur transition hover:bg-white',
             isFavoriteDisabled && 'cursor-not-allowed opacity-70'
           )}
+          aria-label={isFavorite ? favoriteSelectedLabel : favoriteLabel}
         >
           <Heart
             className={cn(
@@ -88,7 +93,9 @@ export function ListingCard({
             )}
             aria-hidden="true"
           />
-          <span className="sr-only">Toggle favorite</span>
+          <span className="sr-only">
+            {isFavorite ? favoriteSelectedLabel : favoriteLabel}
+          </span>
         </button>
       </div>
 

@@ -1,27 +1,21 @@
 'use client';
 
-import { useCallback, useState } from 'react';
 import type { ListingSummary } from '@/lib/types/listing';
 import { ListingCard } from './listing-card';
+import { useI18n, useTranslations } from '@/lib/i18n/provider';
+import { useListingFavorites } from '@/hooks/use-listing-favorites';
 
 interface ListingGridProps {
   listings: ListingSummary[];
 }
 
 export function ListingGrid({ listings }: ListingGridProps) {
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const { locale } = useI18n();
+  const tDirectory = useTranslations('listingsDirectory');
+  const { favorites, toggleFavorite } = useListingFavorites({ locale });
 
-  const handleToggle = useCallback((listingId: string) => {
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(listingId)) {
-        next.delete(listingId);
-      } else {
-        next.add(listingId);
-      }
-      return next;
-    });
-  }, []);
+  const favoriteLabel = tDirectory('card.favorite');
+  const favoriteSelectedLabel = tDirectory('card.favoriteSelected');
 
   return (
     <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -30,7 +24,9 @@ export function ListingGrid({ listings }: ListingGridProps) {
           key={listing.id}
           listing={listing}
           isFavorite={favorites.has(listing.id)}
-          onToggleFavorite={handleToggle}
+          onToggleFavorite={toggleFavorite}
+          favoriteLabel={favoriteLabel}
+          favoriteSelectedLabel={favoriteSelectedLabel}
         />
       ))}
     </div>
