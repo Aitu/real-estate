@@ -170,6 +170,101 @@
       "next": "Suivant"
     }
   },
+  "listingWizard": {
+    "heading": {
+      "edit": "Modifier l’annonce",
+      "create": "Créer une annonce"
+    },
+    "progressNote": "La progression est enregistrée automatiquement. Terminez chaque étape pour publier.",
+    "status": {
+      "published": "Publiée",
+      "draft": "Brouillon"
+    },
+    "savedAt": "Enregistré à {time}",
+    "actions": {
+      "previous": "Précédent",
+      "next": "Étape suivante",
+      "publish": "Publier l’annonce",
+      "saveDraft": "Enregistrer en brouillon"
+    },
+    "fields": {
+      "title": { "label": "Titre", "placeholder": "Appartement lumineux 2 chambres" },
+      "slug": { "label": "Slug", "placeholder": "appartement-lumineux-2-chambres" },
+      "description": {
+        "label": "Description",
+        "placeholder": "Décrivez le bien, le quartier et les points forts."
+      },
+      "propertyType": { "label": "Type de bien", "placeholder": "Choisir un type" },
+      "transactionType": { "label": "Type de transaction" },
+      "street": { "label": "Adresse", "placeholder": "123 Grand Rue" },
+      "city": { "label": "Ville", "placeholder": "Luxembourg" },
+      "postalCode": { "label": "Code postal", "placeholder": "L-1234" },
+      "country": { "label": "Pays (ISO)", "placeholder": "LU" },
+      "bedrooms": { "label": "Chambres" },
+      "bathrooms": { "label": "Salles de bain" },
+      "parkingSpaces": { "label": "Parkings" },
+      "area": { "label": "Surface intérieure (m²)" },
+      "lotArea": { "label": "Terrain (m²)" },
+      "yearBuilt": { "label": "Année de construction" },
+      "floor": { "label": "Étage" },
+      "totalFloors": { "label": "Étages totaux" },
+      "energyClass": { "label": "Classe énergétique", "placeholder": "A+" },
+      "latitude": { "label": "Latitude", "placeholder": "49.6117" },
+      "longitude": { "label": "Longitude", "placeholder": "6.1319" },
+      "price": { "label": "Prix" },
+      "currency": { "label": "Devise", "placeholder": "Choisir la devise", "eur": "EUR" },
+      "contactEmail": { "label": "Email de contact (optionnel)", "placeholder": "vous@example.com" },
+      "contactPhone": { "label": "Téléphone de contact (optionnel)", "placeholder": "+352 123 456" },
+      "displayEmail": {
+        "label": "Afficher l’email",
+        "help": "Les acheteurs verront votre email si activé."
+      },
+      "displayPhone": {
+        "label": "Afficher le téléphone",
+        "help": "Affiche votre numéro aux acheteurs intéressés."
+      }
+    },
+    "options": {
+      "propertyType": {
+        "apartment": "Appartement",
+        "house": "Maison",
+        "duplex": "Duplex",
+        "penthouse": "Penthouse",
+        "office": "Bureau",
+        "land": "Terrain"
+      },
+      "transactionType": {
+        "sale": "À vendre",
+        "rent": "À louer"
+      }
+    },
+    "steps": {
+      "metadata": {
+        "title": "Infos annonce",
+        "description": "Décrivez le bien."
+      },
+      "details": {
+        "title": "Détails du bien",
+        "description": "Ajoutez adresse et infos clés."
+      },
+      "media": {
+        "title": "Médias",
+        "description": "Téléchargez des photos."
+      },
+      "finishing": {
+        "title": "Prix & contact",
+        "description": "Fixez le prix et le contact."
+      },
+      "payment": {
+        "title": "Paiement",
+        "description": "Choisissez une offre et payez."
+      },
+      "review": {
+        "title": "Relire & publier",
+        "description": "Dernière vérification avant publication."
+      }
+    }
+  },
   "listingDetail": {
     "price": "{price}",
     "pricePerMonth": "{price} /mois",

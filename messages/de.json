@@ -170,6 +170,101 @@
       "next": "Weiter"
     }
   },
+  "listingWizard": {
+    "heading": {
+      "edit": "Inserat bearbeiten",
+      "create": "Inserat erstellen"
+    },
+    "progressNote": "Fortschritt wird automatisch gespeichert. Schließe alle Schritte ab, um zu veröffentlichen.",
+    "status": {
+      "published": "Veröffentlicht",
+      "draft": "Entwurf"
+    },
+    "savedAt": "Gespeichert um {time}",
+    "actions": {
+      "previous": "Zurück",
+      "next": "Nächster Schritt",
+      "publish": "Inserat veröffentlichen",
+      "saveDraft": "Als Entwurf speichern"
+    },
+    "fields": {
+      "title": { "label": "Titel", "placeholder": "Helle 2-Zimmer-Wohnung" },
+      "slug": { "label": "Slug", "placeholder": "helle-2-zimmer-wohnung" },
+      "description": {
+        "label": "Beschreibung",
+        "placeholder": "Beschreibe die Immobilie, Umgebung und Besonderheiten."
+      },
+      "propertyType": { "label": "Immobilienart", "placeholder": "Art auswählen" },
+      "transactionType": { "label": "Transaktionsart" },
+      "street": { "label": "Straße", "placeholder": "123 Grand Rue" },
+      "city": { "label": "Stadt", "placeholder": "Luxemburg" },
+      "postalCode": { "label": "Postleitzahl", "placeholder": "L-1234" },
+      "country": { "label": "Land (ISO)", "placeholder": "LU" },
+      "bedrooms": { "label": "Schlafzimmer" },
+      "bathrooms": { "label": "Badezimmer" },
+      "parkingSpaces": { "label": "Parkplätze" },
+      "area": { "label": "Wohnfläche (qm)" },
+      "lotArea": { "label": "Grundstück (qm)" },
+      "yearBuilt": { "label": "Baujahr" },
+      "floor": { "label": "Etage" },
+      "totalFloors": { "label": "Gesamtetagen" },
+      "energyClass": { "label": "Energieklasse", "placeholder": "A+" },
+      "latitude": { "label": "Breitengrad", "placeholder": "49.6117" },
+      "longitude": { "label": "Längengrad", "placeholder": "6.1319" },
+      "price": { "label": "Preis" },
+      "currency": { "label": "Währung", "placeholder": "Währung wählen", "eur": "EUR" },
+      "contactEmail": { "label": "Kontakt-E-Mail (optional)", "placeholder": "du@example.com" },
+      "contactPhone": { "label": "Kontakt-Telefon (optional)", "placeholder": "+352 123 456" },
+      "displayEmail": {
+        "label": "E-Mail im Inserat anzeigen",
+        "help": "Käufer sehen deine E-Mail, wenn aktiviert."
+      },
+      "displayPhone": {
+        "label": "Telefon im Inserat anzeigen",
+        "help": "Zeigt deine Telefonnummer Interessenten."
+      }
+    },
+    "options": {
+      "propertyType": {
+        "apartment": "Wohnung",
+        "house": "Haus",
+        "duplex": "Duplex",
+        "penthouse": "Penthouse",
+        "office": "Büro",
+        "land": "Grundstück"
+      },
+      "transactionType": {
+        "sale": "Zum Verkauf",
+        "rent": "Zur Miete"
+      }
+    },
+    "steps": {
+      "metadata": {
+        "title": "Exposé",
+        "description": "Beschreibe die Immobilie."
+      },
+      "details": {
+        "title": "Daten",
+        "description": "Adresse und Eckdaten."
+      },
+      "media": {
+        "title": "Medien",
+        "description": "Fotos hochladen."
+      },
+      "finishing": {
+        "title": "Preis",
+        "description": "Preis und Kontakdaten festlegen."
+      },
+      "payment": {
+        "title": "Zahlung",
+        "description": "Paket wählen und bezahlen."
+      },
+      "review": {
+        "title": "Prüfen",
+        "description": "Inserat prüfen, dann veröffentlichen."
+      }
+    }
+  },
   "listingDetail": {
     "price": "{price}",
     "pricePerMonth": "{price} /Monat",

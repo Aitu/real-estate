@@ -36,6 +36,7 @@ import type { Locale } from '@/lib/i18n/config';
 import { LISTING_STEP_DEFINITIONS, LISTING_STEP_IDS } from '@/lib/listings/step-definitions';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/hooks/use-current-user';
+import { useTranslations } from '@/lib/i18n/provider';
 
 type ListingImageItem = {
   id: number;
@@ -267,6 +268,7 @@ export function ListingWizard({
   mode = 'create',
   initialPaymentStatus = 'unpaid',
 }: ListingWizardProps) {
+  const tWizard = useTranslations('listingWizard');
   const [currentStep, setCurrentStep] = useState<ListingStep>(initialStep);
   const [listingId, setListingId] = useState<number | null>(initialListingId ?? null);
   const [status, setStatus] = useState<'draft' | 'published'>(initialStatus);
@@ -407,6 +409,17 @@ export function ListingWizard({
     slugDirtyRef.current = true;
     field.onChange(event);
   };
+
+  const stepsWithTranslations = useMemo(
+    () =>
+      LISTING_STEP_DEFINITIONS.map((step) => ({
+        ...step,
+        title: tWizard(`steps.${step.id}.title`),
+        description: step.description ? tWizard(`steps.${step.id}.description`) : undefined,
+      })),
+    [tWizard]
+  );
+  const tf = (path: string) => tWizard(`fields.${path}`);
 
   const currentIndex = STEP_ORDER.indexOf(currentStep);
   const isFirstStep = currentIndex === 0;
@@ -597,11 +610,9 @@ export function ListingWizard({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">
-            {mode === 'edit' ? 'Edit listing' : 'Create a listing'}
+            {mode === 'edit' ? tWizard('heading.edit') : tWizard('heading.create')}
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Progress is saved automatically. Complete every step to publish your listing.
-          </p>
+          <p className="mt-1 text-sm text-slate-500">{tWizard('progressNote')}</p>
         </div>
         <div className="flex items-center gap-3 text-sm">
           <span
@@ -611,7 +622,7 @@ export function ListingWizard({
                 : 'rounded-full bg-slate-100 px-3 py-1 text-slate-600'
             }
           >
-            {status === 'published' ? 'Published' : 'Draft'}
+            {status === 'published' ? tWizard('status.published') : tWizard('status.draft')}
           </span>
           {autoSaveState === 'saving' ? (
             <span className="flex items-center gap-1 text-slate-500">
@@ -620,13 +631,15 @@ export function ListingWizard({
           ) : autoSaveState === 'error' && autoSaveError ? (
             <span className="text-rose-500">{autoSaveError}</span>
           ) : savedAtLabel ? (
-            <span className="text-slate-400">Saved at {savedAtLabel}</span>
+            <span className="text-slate-400">
+              {tWizard('savedAt', { values: { time: savedAtLabel } })}
+            </span>
           ) : null}
         </div>
       </div>
 
       <ListingStepper
-        steps={LISTING_STEP_DEFINITIONS}
+        steps={stepsWithTranslations}
         currentStep={currentStep}
         onStepChange={(step) => {
           const targetIndex = STEP_ORDER.indexOf(step);
@@ -646,9 +659,9 @@ export function ListingWizard({
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Title</FormLabel>
+                      <FormLabel>{tf('title.label')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Sunny two-bedroom apartment" {...field} />
+                        <Input placeholder={tf('title.placeholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -659,10 +672,10 @@ export function ListingWizard({
                   name="slug"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Slug</FormLabel>
+                      <FormLabel>{tf('slug.label')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="sunny-two-bedroom-apartment"
+                          placeholder={tf('slug.placeholder')}
                           {...field}
                           onChange={(event) => handleSlugChange(event, field)}
                         />
@@ -679,16 +692,16 @@ export function ListingWizard({
                   name="propertyType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Property type</FormLabel>
+                      <FormLabel>{tf('propertyType.label')}</FormLabel>
                       <FormControl>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a property type" />
+                            <SelectValue placeholder={tf('propertyType.placeholder')} />
                           </SelectTrigger>
                           <SelectContent align="start">
                             {PROPERTY_TYPES.map((option) => (
                               <SelectItem key={option.value} value={option.value}>
-                                {option.label}
+                                {tWizard(`options.propertyType.${option.value}`)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -703,7 +716,7 @@ export function ListingWizard({
                   name="transactionType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Transaction type</FormLabel>
+                      <FormLabel>{tf('transactionType.label')}</FormLabel>
                       <FormControl>
                         <RadioGroup
                           className="grid grid-cols-2 gap-3"
@@ -718,7 +731,7 @@ export function ListingWizard({
                               }
                             >
                               <RadioGroupItem value={option.value} />
-                              {option.label}
+                              {tWizard(`options.transactionType.${option.value}`)}
                             </label>
                           ))}
                         </RadioGroup>
@@ -731,18 +744,18 @@ export function ListingWizard({
 
               <FormField
                 control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className="mt-6">
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Describe the property, its surroundings, and standout amenities."
-                        {...field}
-                        value={field.value ?? ''}
-                      />
-                    </FormControl>
-                    <FormMessage />
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem className="mt-6">
+                      <FormLabel>{tf('description.label')}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={tf('description.placeholder')}
+                          {...field}
+                          value={field.value ?? ''}
+                        />
+                      </FormControl>
+                      <FormMessage />
                   </FormItem>
                 )}
               />
@@ -757,9 +770,9 @@ export function ListingWizard({
                   name="street"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Street address</FormLabel>
+                      <FormLabel>{tf('street.label')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="123 Grand Rue" {...field} />
+                        <Input placeholder={tf('street.placeholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -770,9 +783,9 @@ export function ListingWizard({
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>City</FormLabel>
+                      <FormLabel>{tf('city.label')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Luxembourg" {...field} />
+                        <Input placeholder={tf('city.placeholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -783,9 +796,9 @@ export function ListingWizard({
                   name="postalCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Postal code</FormLabel>
+                      <FormLabel>{tf('postalCode.label')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="L-1234" {...field} />
+                        <Input placeholder={tf('postalCode.placeholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -796,9 +809,9 @@ export function ListingWizard({
                   name="country"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Country (ISO code)</FormLabel>
+                      <FormLabel>{tf('country.label')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="LU" {...field} />
+                        <Input placeholder={tf('country.placeholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -809,14 +822,14 @@ export function ListingWizard({
               <div className="mt-8 grid gap-6 md:grid-cols-3">
                 {(
                   [
-                    { name: 'bedrooms', label: 'Bedrooms' },
-                    { name: 'bathrooms', label: 'Bathrooms' },
-                    { name: 'parkingSpaces', label: 'Parking spaces' },
-                    { name: 'area', label: 'Interior area (sqm)' },
-                    { name: 'lotArea', label: 'Lot area (sqm)' },
-                    { name: 'yearBuilt', label: 'Year built' },
-                    { name: 'floor', label: 'Floor' },
-                    { name: 'totalFloors', label: 'Total floors' },
+                    { name: 'bedrooms', label: tf('bedrooms.label') },
+                    { name: 'bathrooms', label: tf('bathrooms.label') },
+                    { name: 'parkingSpaces', label: tf('parkingSpaces.label') },
+                    { name: 'area', label: tf('area.label') },
+                    { name: 'lotArea', label: tf('lotArea.label') },
+                    { name: 'yearBuilt', label: tf('yearBuilt.label') },
+                    { name: 'floor', label: tf('floor.label') },
+                    { name: 'totalFloors', label: tf('totalFloors.label') },
                   ] as Array<{ name: keyof ListingEditorValues; label: string }>
                 ).map((item) => (
                   <Controller
@@ -850,9 +863,9 @@ export function ListingWizard({
                   name="energyClass"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Energy class</FormLabel>
+                      <FormLabel>{tf('energyClass.label')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="A+" {...field} />
+                        <Input placeholder={tf('energyClass.placeholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -864,7 +877,7 @@ export function ListingWizard({
                     name="latitude"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Latitude</FormLabel>
+                        <FormLabel>{tf('latitude.label')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -874,7 +887,7 @@ export function ListingWizard({
                               const value = event.target.value;
                               field.onChange(value === '' ? null : Number(value));
                             }}
-                            placeholder="49.6117"
+                            placeholder={tf('latitude.placeholder')}
                           />
                         </FormControl>
                         <FormMessage />
@@ -886,7 +899,7 @@ export function ListingWizard({
                     name="longitude"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Longitude</FormLabel>
+                        <FormLabel>{tf('longitude.label')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -896,7 +909,7 @@ export function ListingWizard({
                               const value = event.target.value;
                               field.onChange(value === '' ? null : Number(value));
                             }}
-                            placeholder="6.1319"
+                            placeholder={tf('longitude.placeholder')}
                           />
                         </FormControl>
                         <FormMessage />
@@ -916,7 +929,7 @@ export function ListingWizard({
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price</FormLabel>
+                      <FormLabel>{tf('price.label')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -939,14 +952,14 @@ export function ListingWizard({
                   name="currency"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Currency</FormLabel>
+                      <FormLabel>{tf('currency.label')}</FormLabel>
                       <FormControl>
                         <Select value={field.value ?? 'EUR'} onValueChange={field.onChange}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select currency" />
+                            <SelectValue placeholder={tf('currency.placeholder')} />
                           </SelectTrigger>
                           <SelectContent align="start">
-                            <SelectItem value="EUR">EUR</SelectItem>
+                            <SelectItem value="EUR">{tf('currency.eur')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -962,11 +975,11 @@ export function ListingWizard({
                   name="contactEmail"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contact email (optional)</FormLabel>
+                      <FormLabel>{tf('contactEmail.label')}</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="you@example.com"
+                          placeholder={tf('contactEmail.placeholder')}
                           value={field.value ?? ''}
                           onChange={(event) => field.onChange(event.target.value)}
                         />
@@ -980,11 +993,11 @@ export function ListingWizard({
                   name="contactPhone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contact phone (optional)</FormLabel>
+                      <FormLabel>{tf('contactPhone.label')}</FormLabel>
                       <FormControl>
                         <Input
                           type="tel"
-                          placeholder="+352 123 456"
+                          placeholder={tf('contactPhone.placeholder')}
                           value={field.value ?? ''}
                           onChange={(event) => field.onChange(event.target.value)}
                         />
@@ -1002,10 +1015,8 @@ export function ListingWizard({
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-2 rounded-2xl border border-slate-200 px-4 py-3">
                       <div>
-                        <FormLabel>Show email on listing</FormLabel>
-                        <p className="text-xs text-slate-500">
-                          Buyers will see your email address when this is enabled.
-                        </p>
+                        <FormLabel>{tf('displayEmail.label')}</FormLabel>
+                        <p className="text-xs text-slate-500">{tf('displayEmail.help')}</p>
                       </div>
                       <FormControl>
                         <VisibilityToggle checked={field.value} onChange={field.onChange} />
@@ -1019,10 +1030,8 @@ export function ListingWizard({
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-2 rounded-2xl border border-slate-200 px-4 py-3">
                       <div>
-                        <FormLabel>Show phone on listing</FormLabel>
-                        <p className="text-xs text-slate-500">
-                          Toggle to display your phone number to interested buyers.
-                        </p>
+                        <FormLabel>{tf('displayPhone.label')}</FormLabel>
+                        <p className="text-xs text-slate-500">{tf('displayPhone.help')}</p>
                       </div>
                       <FormControl>
                         <VisibilityToggle checked={field.value} onChange={field.onChange} />
@@ -1364,7 +1373,7 @@ export function ListingWizard({
                   {isStatusUpdating && status !== 'published' ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : null}
-                  Publish listing
+                  {tWizard('actions.publish')}
                 </Button>
                 <Button
                   type="button"
@@ -1376,7 +1385,7 @@ export function ListingWizard({
                   {isStatusUpdating && status === 'published' ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : null}
-                  Save as draft
+                  {tWizard('actions.saveDraft')}
                 </Button>
               </div>
             </section>
@@ -1390,7 +1399,7 @@ export function ListingWizard({
               disabled={isFirstStep}
               className="rounded-full"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+              <ArrowLeft className="mr-2 h-4 w-4" /> {tWizard('actions.previous')}
             </Button>
             <div className="flex gap-3">
               {!isLastStep && (
@@ -1400,7 +1409,7 @@ export function ListingWizard({
                   disabled={isSavingDraft || (currentStep === 'media' && !listingId)}
                   className="rounded-full"
                 >
-                  Next step <ArrowRight className="ml-2 h-4 w-4" />
+                  {tWizard('actions.next')} <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               )}
             </div>

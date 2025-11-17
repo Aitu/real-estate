@@ -170,6 +170,161 @@
       "next": "Next"
     }
   },
+  "listingWizard": {
+    "heading": {
+      "edit": "Edit listing",
+      "create": "Create a listing"
+    },
+    "progressNote": "Progress is saved automatically. Complete every step to publish your listing.",
+    "status": {
+      "published": "Published",
+      "draft": "Draft"
+    },
+    "savedAt": "Saved at {time}",
+    "actions": {
+      "previous": "Previous",
+      "next": "Next step",
+      "publish": "Publish listing",
+      "saveDraft": "Save as draft"
+    },
+    "fields": {
+      "title": {
+        "label": "Title",
+        "placeholder": "Sunny two-bedroom apartment"
+      },
+      "slug": {
+        "label": "Slug",
+        "placeholder": "sunny-two-bedroom-apartment"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Describe the property, its surroundings, and standout amenities."
+      },
+      "propertyType": {
+        "label": "Property type",
+        "placeholder": "Select a property type"
+      },
+      "transactionType": {
+        "label": "Transaction type"
+      },
+      "street": {
+        "label": "Street address",
+        "placeholder": "123 Grand Rue"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "Luxembourg"
+      },
+      "postalCode": {
+        "label": "Postal code",
+        "placeholder": "L-1234"
+      },
+      "country": {
+        "label": "Country (ISO code)",
+        "placeholder": "LU"
+      },
+      "bedrooms": {
+        "label": "Bedrooms"
+      },
+      "bathrooms": {
+        "label": "Bathrooms"
+      },
+      "parkingSpaces": {
+        "label": "Parking spaces"
+      },
+      "area": {
+        "label": "Interior area (sqm)"
+      },
+      "lotArea": {
+        "label": "Lot area (sqm)"
+      },
+      "yearBuilt": {
+        "label": "Year built"
+      },
+      "floor": {
+        "label": "Floor"
+      },
+      "totalFloors": {
+        "label": "Total floors"
+      },
+      "energyClass": {
+        "label": "Energy class",
+        "placeholder": "A+"
+      },
+      "latitude": {
+        "label": "Latitude",
+        "placeholder": "49.6117"
+      },
+      "longitude": {
+        "label": "Longitude",
+        "placeholder": "6.1319"
+      },
+      "price": {
+        "label": "Price"
+      },
+      "currency": {
+        "label": "Currency",
+        "placeholder": "Select currency",
+        "eur": "EUR"
+      },
+      "contactEmail": {
+        "label": "Contact email (optional)",
+        "placeholder": "you@example.com"
+      },
+      "contactPhone": {
+        "label": "Contact phone (optional)",
+        "placeholder": "+352 123 456"
+      },
+      "displayEmail": {
+        "label": "Show email on listing",
+        "help": "Buyers will see your email address when this is enabled."
+      },
+      "displayPhone": {
+        "label": "Show phone on listing",
+        "help": "Toggle to display your phone number to interested buyers."
+      }
+    },
+    "options": {
+      "propertyType": {
+        "apartment": "Apartment",
+        "house": "House",
+        "duplex": "Duplex",
+        "penthouse": "Penthouse",
+        "office": "Office",
+        "land": "Land"
+      },
+      "transactionType": {
+        "sale": "For sale",
+        "rent": "For rent"
+      }
+    },
+    "steps": {
+      "metadata": {
+        "title": "Info",
+        "description": "Describe the property."
+      },
+      "details": {
+        "title": "Details",
+        "description": "Add address and specs."
+      },
+      "media": {
+        "title": "Media",
+        "description": "Upload photos."
+      },
+      "finishing": {
+        "title": "Pricing",
+        "description": "Set price and how to reach you."
+      },
+      "payment": {
+        "title": "Payment",
+        "description": "Pick a tier and pay."
+      },
+      "review": {
+        "title": "Review",
+        "description": "Final check, then publish."
+      }
+    }
+  },
   "listingDetail": {
     "price": "{price}",
     "pricePerMonth": "{price} /mo",
