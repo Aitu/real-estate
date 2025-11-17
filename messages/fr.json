@@ -192,7 +192,8 @@
       "slug": { "label": "Slug", "placeholder": "appartement-lumineux-2-chambres" },
       "description": {
         "label": "Description",
-        "placeholder": "Décrivez le bien, le quartier et les points forts."
+        "placeholder": "Décrivez le bien, le quartier et les points forts.",
+        "hint": "Max 5000 caractères."
       },
       "propertyType": { "label": "Type de bien", "placeholder": "Choisir un type" },
       "transactionType": { "label": "Type de transaction" },

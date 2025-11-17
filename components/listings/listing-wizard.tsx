@@ -102,7 +102,7 @@ const PAYMENT_PLANS = [
 ];
 
 const STEP_FIELDS: Record<ListingStep, Array<keyof ListingEditorValues>> = {
-  metadata: ['title', 'slug', 'description', 'propertyType', 'transactionType'],
+  metadata: ['title', 'description', 'propertyType', 'transactionType'],
   details: [
     'street',
     'city',
@@ -667,23 +667,6 @@ export function ListingWizard({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{tf('slug.label')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={tf('slug.placeholder')}
-                          {...field}
-                          onChange={(event) => handleSlugChange(event, field)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
 
               <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -744,18 +727,28 @@ export function ListingWizard({
 
               <FormField
                 control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem className="mt-6">
-                      <FormLabel>{tf('description.label')}</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder={tf('description.placeholder')}
-                          {...field}
-                          value={field.value ?? ''}
-                        />
-                      </FormControl>
-                      <FormMessage />
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="mt-6">
+                    <FormLabel>{tf('description.label')}</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder={tf('description.placeholder')}
+                        {...field}
+                        value={field.value ?? ''}
+                      />
+                    </FormControl>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-500">{tf('description.hint')}</span>
+                      <span
+                        className={cn(
+                          (field.value?.length ?? 0) > 5000 ? 'text-rose-600' : 'text-slate-400'
+                        )}
+                      >
+                        {(field.value?.length ?? 0)}/{5000}
+                      </span>
+                    </div>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

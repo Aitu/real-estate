@@ -192,7 +192,8 @@
       "slug": { "label": "Slug", "placeholder": "helle-2-zimmer-wohnung" },
       "description": {
         "label": "Beschreibung",
-        "placeholder": "Beschreibe die Immobilie, Umgebung und Besonderheiten."
+        "placeholder": "Beschreibe die Immobilie, Umgebung und Besonderheiten.",
+        "hint": "Max. 5000 Zeichen."
       },
       "propertyType": { "label": "Immobilienart", "placeholder": "Art auswählen" },
       "transactionType": { "label": "Transaktionsart" },

@@ -15,7 +15,7 @@ export const listingMetadataSchema = z.object({
   description: z
     .string()
     .trim()
-    .max(4000, 'Description is too long')
+    .max(5000, 'Description is too long')
     .optional()
     .nullable(),
   propertyType: z

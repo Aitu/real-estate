@@ -198,7 +198,8 @@
       },
       "description": {
         "label": "Description",
-        "placeholder": "Describe the property, its surroundings, and standout amenities."
+        "placeholder": "Describe the property, its surroundings, and standout amenities.",
+        "hint": "Max 5000 characters."
       },
       "propertyType": {
         "label": "Property type",
