@@ -402,6 +402,7 @@
         "listing": "Listing",
         "status": "Status",
         "price": "Price",
+        "stats": "Stats",
         "updated": "Last updated",
         "actions": "Actions"
       },
@@ -412,7 +413,13 @@
         "deactivatePending": "Deactivating…",
         "confirmDeactivate": "Are you sure you want to deactivate this listing?"
       },
-      "noResults": "You haven't created any listings yet."
+      "noResults": "You haven't created any listings yet.",
+      "stats": {
+        "views": "views",
+        "favorites": "favorites",
+        "contacts": "contacts",
+        "notAvailable": "N/A"
+      }
     },
     "pagination": {
       "previous": "Previous",

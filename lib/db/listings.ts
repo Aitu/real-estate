@@ -1,6 +1,6 @@
-import { and, asc, desc, eq, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, ne, sql } from 'drizzle-orm';
 import { db } from './drizzle';
-import { listings } from './schema';
+import { favorites, listings } from './schema';
 import type { ListingDetail } from '@/lib/types/listing';
 import type {
   Listing as ListingRow,
@@ -79,11 +79,11 @@ function mapListingRecord(record: ListingWithRelations): ListingDetail {
       value: feature.value,
       icon: feature.icon,
     })),
-    owner: {
-      id: owner.id,
-      name: owner.name,
-      email: owner.email,
-      phoneNumber: owner.phoneNumber,
+  owner: {
+    id: owner.id,
+    name: owner.name,
+    email: owner.email,
+    phoneNumber: owner.phoneNumber,
       avatarUrl: owner.avatarUrl,
       locale: owner.locale,
     },
@@ -95,8 +95,10 @@ function mapListingRecord(record: ListingWithRelations): ListingDetail {
       : null,
     promotionTier: record.promotionTier ?? 'standard',
     paymentStatus: record.paymentStatus ?? 'unpaid',
-    displayEmail: record.displayEmail ?? true,
-    displayPhone: record.displayPhone ?? true,
+  displayEmail: record.displayEmail ?? true,
+  displayPhone: record.displayPhone ?? true,
+  viewsCount: record.viewsCount ?? 0,
+  contactsCount: record.contactsCount ?? 0,
     publishedAt: toIsoString(record.publishedAt),
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
@@ -150,6 +152,36 @@ export async function getListingDetail(
   }
 
   return mapListingRecord(record as ListingWithRelations);
+}
+
+export async function incrementListingView(
+  listingId: number,
+  viewerId?: number
+): Promise<void> {
+  const conditions = [eq(listings.id, listingId), eq(listings.status, 'published')];
+  if (viewerId) {
+    conditions.push(ne(listings.ownerId, viewerId));
+  }
+
+  await db
+    .update(listings)
+    .set({ viewsCount: sql`COALESCE(${listings.viewsCount}, 0) + 1` })
+    .where(and(...conditions));
+}
+
+export async function incrementListingContact(
+  listingId: number,
+  viewerId?: number
+): Promise<void> {
+  const conditions = [eq(listings.id, listingId), eq(listings.status, 'published')];
+  if (viewerId) {
+    conditions.push(ne(listings.ownerId, viewerId));
+  }
+
+  await db
+    .update(listings)
+    .set({ contactsCount: sql`COALESCE(${listings.contactsCount}, 0) + 1` })
+    .where(and(...conditions));
 }
 
 export async function getListingDetailBySlug(
@@ -277,6 +309,9 @@ export async function getListingsForOwner(
         contactPhone: true,
         displayEmail: true,
         displayPhone: true,
+        viewsCount: true,
+        contactsCount: true,
+        favoritesCount: sql<number>`(select count(*) from ${favorites} f where f.listing_id = ${listings.id})`,
         promotionTier: true,
         paymentStatus: true,
         paidAt: true,
@@ -322,6 +357,9 @@ export async function getListingsForOwner(
     displayPhone: record.displayPhone ?? true,
     promotionTier: record.promotionTier ?? 'standard',
     paymentStatus: record.paymentStatus ?? 'unpaid',
+    viewsCount: record.viewsCount ?? 0,
+    contactsCount: record.contactsCount ?? 0,
+    favoritesCount: (record as any).favoritesCount ?? 0,
   } satisfies OwnerListing));
 
   return { listings: mapped, totalCount };

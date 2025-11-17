@@ -86,6 +86,7 @@ export default async function MyListingsPage({
         listing: t('table.headers.listing'),
         status: t('table.headers.status'),
         price: t('table.headers.price'),
+        stats: t('table.headers.stats'),
         updated: t('table.headers.updated'),
         actions: t('table.headers.actions'),
       },
@@ -98,6 +99,12 @@ export default async function MyListingsPage({
     },
     statusLabels,
     propertyTypeLabels,
+    stats: {
+      views: t('table.stats.views'),
+      favorites: t('table.stats.favorites'),
+      contacts: t('table.stats.contacts'),
+      notAvailable: t('table.stats.notAvailable'),
+    },
     pagination: {
       previous: t('pagination.previous'),
       next: t('pagination.next'),

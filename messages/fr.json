@@ -342,17 +342,24 @@
         "listing": "Annonce",
         "status": "Statut",
         "price": "Prix",
+        "stats": "Stats",
         "updated": "Dernière mise à jour",
         "actions": "Actions"
       },
       "actions": {
-        "view": "Voir l'annonce",
+        "view": "Voir l’annonce",
         "edit": "Modifier",
         "deactivate": "Désactiver",
         "deactivatePending": "Désactivation…",
         "confirmDeactivate": "Voulez-vous vraiment désactiver cette annonce ?"
       },
-      "noResults": "Vous n'avez pas encore créé d'annonce."
+      "noResults": "Vous n’avez pas encore créé d’annonce.",
+      "stats": {
+        "views": "vues",
+        "favorites": "favoris",
+        "contacts": "contacts",
+        "notAvailable": "N/D"
+      }
     },
     "pagination": {
       "previous": "Précédent",

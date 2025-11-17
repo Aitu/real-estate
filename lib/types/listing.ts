@@ -99,6 +99,8 @@ export interface ListingDetail {
   contactPhone: string | null;
   displayEmail: boolean;
   displayPhone: boolean;
+  viewsCount?: number;
+  contactsCount?: number;
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -134,4 +136,7 @@ export interface OwnerListing {
   displayPhone?: boolean;
   promotionTier?: ListingPlanTier;
   paymentStatus?: ListingPaymentStatus;
+  viewsCount?: number;
+  contactsCount?: number;
+  favoritesCount?: number;
 }

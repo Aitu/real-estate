@@ -5,11 +5,13 @@ import type { LucideIcon } from 'lucide-react';
 import { Bath, BedDouble, CalendarDays, Car, Leaf, Ruler } from 'lucide-react';
 import { ListingGallery } from '@/components/listings/listing-gallery';
 import { ListingMap } from '@/components/map/listing-map';
-import { getListingDetail } from '@/lib/db/listings';
+import { getListingDetail, incrementListingView } from '@/lib/db/listings';
 import { isLocale, type Locale } from '@/lib/i18n/config';
 import { loadMessages } from '@/lib/i18n/get-messages';
 import { getTranslator } from '@/lib/i18n/server';
 import { formatCurrency } from '@/lib/i18n/format';
+import { getUser } from '@/lib/db/queries';
+import { incrementListingContactAction } from './actions';
 
 export async function generateMetadata({
   params,
@@ -70,13 +72,18 @@ export default async function ListingDetailPage({
 
   const locale = localeParam as Locale;
 
-  const [messages, listing] = await Promise.all([
+  const [messages, listing, user] = await Promise.all([
     loadMessages(locale),
     getListingDetail(listingId),
+    getUser(),
   ]);
 
   if (!listing) {
     notFound();
+  }
+
+  if (!user || user.id !== listing.owner.id) {
+    await incrementListingView(listingId, user?.id);
   }
 
   const t = getTranslator(locale, messages, 'listingDetail');
@@ -302,12 +309,15 @@ export default async function ListingDetailPage({
                   </dd>
                 </div>
               </dl>
-              <button
-                type="button"
-                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-slate-800"
-              >
-                {t('contactCta')}
-              </button>
+              <form action={incrementListingContactAction}>
+                <input type="hidden" name="listingId" value={listing.id} />
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-slate-800"
+                >
+                  {t('contactCta')}
+                </button>
+              </form>
             </div>
           </section>
         </aside>

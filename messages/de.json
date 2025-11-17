@@ -342,6 +342,7 @@
         "listing": "Inserat",
         "status": "Status",
         "price": "Preis",
+        "stats": "Statistiken",
         "updated": "Zuletzt aktualisiert",
         "actions": "Aktionen"
       },
@@ -352,7 +353,13 @@
         "deactivatePending": "Deaktivierung…",
         "confirmDeactivate": "Möchten Sie dieses Inserat wirklich deaktivieren?"
       },
-      "noResults": "Sie haben noch keine Inserate erstellt."
+      "noResults": "Sie haben noch keine Inserate erstellt.",
+      "stats": {
+        "views": "Aufrufe",
+        "favorites": "Favoriten",
+        "contacts": "Kontakte",
+        "notAvailable": "k. A."
+      }
     },
     "pagination": {
       "previous": "Zurück",

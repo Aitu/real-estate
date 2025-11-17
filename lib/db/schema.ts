@@ -71,6 +71,8 @@ export const listings = pgTable(
     promotionTier: promotionTierEnum('promotion_tier').notNull().default('standard'),
     paymentStatus: paymentStatusEnum('payment_status').notNull().default('unpaid'),
     paidAt: timestamp('paid_at'),
+    viewsCount: integer('views_count').notNull().default(0),
+    contactsCount: integer('contacts_count').notNull().default(0),
     publishedAt: timestamp('published_at'),
     expiresAt: timestamp('expires_at'),
     createdAt: timestamp('created_at').notNull().defaultNow(),

@@ -10,7 +10,7 @@ import { deactivateListing } from './actions';
 import type { ActionState } from '@/lib/auth/middleware';
 import type { OwnerListingSort } from '@/lib/db/listings';
 import { useFormStatus } from 'react-dom';
-import { Eye, Loader2, PencilLine, Power } from 'lucide-react';
+import { Eye, Heart, Loader2, PencilLine, PhoneCall, Power } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 const STATUS_BADGE_STYLES: Record<ListingStatus, string> = {
@@ -33,6 +33,7 @@ export type MyListingsCopy = {
       listing: string;
       status: string;
       price: string;
+      stats: string;
       updated: string;
       actions: string;
     };
@@ -45,6 +46,12 @@ export type MyListingsCopy = {
   };
   statusLabels: Record<ListingStatus, string>;
   propertyTypeLabels: Record<string, string>;
+  stats: {
+    views: string;
+    favorites: string;
+    contacts: string;
+    notAvailable: string;
+  };
   pagination: {
     previous: string;
     next: string;
@@ -262,6 +269,9 @@ export function MyListingsManager({
                 {copy.table.headers.price}
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {copy.table.headers.stats}
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 {copy.table.headers.updated}
               </th>
               <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -272,7 +282,7 @@ export function MyListingsManager({
           <tbody className="divide-y divide-slate-100">
             {listings.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-500">
+                <td colSpan={6} className="px-4 py-8 text-center text-sm text-slate-500">
                   {copy.table.noResults}
                 </td>
               </tr>
@@ -304,6 +314,26 @@ export function MyListingsManager({
                     </td>
                     <td className="px-4 py-4 align-top text-sm font-medium text-slate-900">
                       {formatCurrency(locale, listing.currency, listing.price)}
+                    </td>
+                    <td className="px-4 py-4 align-top">
+                      {listing.status === 'published' ? (
+                        <div className="flex flex-wrap gap-2 text-xs text-slate-600">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1">
+                            <Eye className="h-3.5 w-3.5 text-slate-500" />
+                            {listing.viewsCount ?? 0} {copy.stats.views}
+                          </span>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1">
+                            <Heart className="h-3.5 w-3.5 text-slate-500" />
+                            {listing.favoritesCount ?? 0} {copy.stats.favorites}
+                          </span>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1">
+                            <PhoneCall className="h-3.5 w-3.5 text-slate-500" />
+                            {listing.contactsCount ?? 0} {copy.stats.contacts}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-400">{copy.stats.notAvailable}</span>
+                      )}
                     </td>
                     <td className="px-4 py-4 align-top text-xs text-slate-500">
                       {formatDate(locale, listing.updatedAt)}
