@@ -2,15 +2,21 @@ import {
   boolean,
   doublePrecision,
   index,
+  integer,
+  pgEnum,
   pgTable,
   serial,
   text,
   timestamp,
   uniqueIndex,
   varchar,
-  integer,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+
+const listingStatusEnum = pgEnum('listing_status', ['draft', 'published', 'inactive']);
+const transactionTypeEnum = pgEnum('listing_transaction_type', ['sale', 'rent']);
+const promotionTierEnum = pgEnum('listing_promotion_tier', ['standard', 'plus', 'premium']);
+const paymentStatusEnum = pgEnum('listing_payment_status', ['paid', 'unpaid']);
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -22,7 +28,7 @@ export const users = pgTable('users', {
   phoneNumber: varchar('phone_number', { length: 32 }),
   avatarUrl: text('avatar_url'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
   deletedAt: timestamp('deleted_at'),
 });
 
@@ -37,10 +43,10 @@ export const listings = pgTable(
     title: varchar('title', { length: 180 }).notNull(),
     description: text('description'),
     propertyType: varchar('property_type', { length: 50 }).notNull(),
-    transactionType: varchar('transaction_type', { length: 20 })
+    transactionType: transactionTypeEnum('transaction_type')
       .notNull()
       .default('sale'),
-    status: varchar('status', { length: 20 }).notNull().default('draft'),
+    status: listingStatusEnum('status').notNull().default('draft'),
     price: integer('price').notNull(),
     currency: varchar('currency', { length: 3 }).notNull().default('EUR'),
     bedrooms: integer('bedrooms'),
@@ -62,10 +68,13 @@ export const listings = pgTable(
     contactPhone: varchar('contact_phone', { length: 32 }),
     displayEmail: boolean('display_email').notNull().default(true),
     displayPhone: boolean('display_phone').notNull().default(true),
+    promotionTier: promotionTierEnum('promotion_tier').notNull().default('standard'),
+    paymentStatus: paymentStatusEnum('payment_status').notNull().default('unpaid'),
+    paidAt: timestamp('paid_at'),
     publishedAt: timestamp('published_at'),
     expiresAt: timestamp('expires_at'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
   },
   (table) => ({
     ownerIdx: index('listings_owner_idx').on(table.ownerId),
@@ -152,7 +161,7 @@ export const alerts = pgTable(
     frequency: varchar('frequency', { length: 20 }).default('instant'),
     lastTriggeredAt: timestamp('last_triggered_at'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
   },
   (table) => ({
     userIdx: index('alerts_user_idx').on(table.userId),
@@ -163,7 +172,7 @@ export const teams = pgTable('teams', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
   stripeCustomerId: text('stripe_customer_id').unique(),
   stripeSubscriptionId: text('stripe_subscription_id').unique(),
   stripeProductId: text('stripe_product_id'),
@@ -175,20 +184,22 @@ export const teamMembers = pgTable('team_members', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: 'cascade' }),
   teamId: integer('team_id')
     .notNull()
-    .references(() => teams.id),
+    .references(() => teams.id, { onDelete: 'cascade' }),
   role: varchar('role', { length: 50 }).notNull(),
   joinedAt: timestamp('joined_at').notNull().defaultNow(),
-});
+}, (table) => ({
+  teamMemberUnique: uniqueIndex('team_members_user_team_unique').on(table.userId, table.teamId),
+}));
 
 export const activityLogs = pgTable('activity_logs', {
   id: serial('id').primaryKey(),
   teamId: integer('team_id')
     .notNull()
-    .references(() => teams.id),
-  userId: integer('user_id').references(() => users.id),
+    .references(() => teams.id, { onDelete: 'cascade' }),
+  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
   action: text('action').notNull(),
   timestamp: timestamp('timestamp').notNull().defaultNow(),
   ipAddress: varchar('ip_address', { length: 45 }),
@@ -198,12 +209,12 @@ export const invitations = pgTable('invitations', {
   id: serial('id').primaryKey(),
   teamId: integer('team_id')
     .notNull()
-    .references(() => teams.id),
+    .references(() => teams.id, { onDelete: 'cascade' }),
   email: varchar('email', { length: 255 }).notNull(),
   role: varchar('role', { length: 50 }).notNull(),
   invitedBy: integer('invited_by')
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: 'cascade' }),
   invitedAt: timestamp('invited_at').notNull().defaultNow(),
   status: varchar('status', { length: 20 }).notNull().default('pending'),
 });

@@ -38,6 +38,7 @@ function mapDetailToEditorValues(detail: Awaited<ReturnType<typeof getListingDet
     contactPhone: detail.contactPhone ?? '',
     displayEmail: detail.displayEmail ?? true,
     displayPhone: detail.displayPhone ?? true,
+    promotionTier: detail.promotionTier ?? 'standard',
   };
 }
 
@@ -80,6 +81,7 @@ export default async function EditListingPage({
         mode="edit"
         initialListingId={listing.id}
         initialStatus={listing.status === 'published' ? 'published' : 'draft'}
+        initialPaymentStatus={listing.paymentStatus === 'paid' ? 'paid' : 'unpaid'}
         initialValues={initialValues}
         initialImages={listing.images.map((image) => ({
           id: image.id,

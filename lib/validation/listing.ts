@@ -122,17 +122,25 @@ export const listingFinishingSchema = z.object({
   displayPhone: z.boolean().default(true),
 });
 
+const promotionTierSchema = z.enum(['standard', 'plus', 'premium']);
+
+export const listingPaymentSchema = z.object({
+  promotionTier: promotionTierSchema.default('standard'),
+});
+
 export const listingEditorSchema = listingMetadataSchema
   .extend({
     slug: listingMetadataSchema.shape.slug,
     description: listingMetadataSchema.shape.description,
   })
   .merge(listingDetailsSchema)
-  .merge(listingFinishingSchema);
+  .merge(listingFinishingSchema)
+  .merge(listingPaymentSchema);
 
 export type ListingMetadataInput = z.infer<typeof listingMetadataSchema>;
 export type ListingDetailsInput = z.infer<typeof listingDetailsSchema>;
 export type ListingFinishingInput = z.infer<typeof listingFinishingSchema>;
+export type ListingPaymentInput = z.infer<typeof listingPaymentSchema>;
 export type ListingEditorValues = z.infer<typeof listingEditorSchema>;
 
-export type ListingStep = 'metadata' | 'details' | 'media' | 'finishing' | 'review';
+export type ListingStep = 'metadata' | 'details' | 'media' | 'finishing' | 'payment' | 'review';

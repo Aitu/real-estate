@@ -56,6 +56,8 @@ export interface ListingDetail {
   propertyType: string;
   transactionType: 'sale' | 'rent';
   status: string;
+  promotionTier?: ListingPlanTier;
+  paymentStatus?: ListingPaymentStatus;
   price: number;
   currency: string;
   bedrooms: number | null;
@@ -103,6 +105,8 @@ export interface ListingDetail {
 }
 
 export type ListingStatus = 'draft' | 'published' | 'inactive';
+export type ListingPlanTier = 'standard' | 'plus' | 'premium';
+export type ListingPaymentStatus = 'unpaid' | 'paid';
 
 export interface OwnerListing {
   id: number;
@@ -128,4 +132,6 @@ export interface OwnerListing {
   contactPhone?: string | null;
   displayEmail?: boolean;
   displayPhone?: boolean;
+  promotionTier?: ListingPlanTier;
+  paymentStatus?: ListingPaymentStatus;
 }

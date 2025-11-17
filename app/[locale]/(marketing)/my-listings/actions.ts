@@ -12,6 +12,7 @@ import {
   ListingMetadataInput,
   ListingFinishingInput,
   ListingStep,
+  listingPaymentSchema,
   listingDetailsSchema,
   listingMetadataSchema,
   listingFinishingSchema,
@@ -32,6 +33,7 @@ import type { ListingStatus } from '@/lib/types/listing';
 
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+const DRAFT_LISTING_LIMIT = Number.parseInt(process.env.LISTING_DRAFT_LIMIT ?? '5', 10) || 5;
 
 function normalizeLocale(locale: string): string {
   if (!isLocale(locale)) {
@@ -98,6 +100,7 @@ async function requireOwnedListing(listingId: number, ownerId: number) {
       city: listings.city,
       postalCode: listings.postalCode,
       status: listings.status,
+      paymentStatus: listings.paymentStatus,
     })
     .from(listings)
     .where(eq(listings.id, listingId))
@@ -171,6 +174,9 @@ function mapMetadataToInsert(
     contactPhone: null,
     displayEmail: true,
     displayPhone: true,
+    promotionTier: 'standard',
+    paymentStatus: 'unpaid',
+    paidAt: null,
     createdAt: now,
     updatedAt: now,
   };
@@ -246,6 +252,19 @@ export async function saveListingDraftAction(
   if (input.step === 'metadata') {
     const parsed = listingMetadataSchema.parse(input.values);
     if (!input.listingId) {
+      const [{ value: draftCount }] =
+        (await db
+          .select({ value: count() })
+          .from(listings)
+          .where(and(eq(listings.ownerId, user.id), eq(listings.status, 'draft')))
+          .limit(1)) ?? [{ value: 0 }];
+
+      if (Number(draftCount ?? 0) >= DRAFT_LISTING_LIMIT) {
+        throw new Error(
+          `Draft limit reached (${DRAFT_LISTING_LIMIT}). Publish or delete a draft to create another.`
+        );
+      }
+
       const slug = await ensureUniqueSlug(parsed.slug ?? parsed.title);
       const [created] = await db
         .insert(listings)
@@ -324,6 +343,27 @@ export async function saveListingDraftAction(
       slug: '',
       status: 'updated',
       step: 'finishing',
+      savedAt: now.toISOString(),
+    };
+  }
+
+  if (input.step === 'payment') {
+    const parsed = listingPaymentSchema.parse(input.values);
+    await db
+      .update(listings)
+      .set({
+        promotionTier: parsed.promotionTier,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(listings.id, input.listingId), eq(listings.ownerId, user.id)));
+
+    revalidateListingViews(locale, input.listingId);
+
+    return {
+      listingId: input.listingId,
+      slug: '',
+      status: 'updated',
+      step: 'payment',
       savedAt: now.toISOString(),
     };
   }
@@ -442,6 +482,30 @@ export async function deleteListingImageAction(params: {
   return { listingId: params.listingId, imageId: params.imageId };
 }
 
+export async function completeListingPaymentAction(params: {
+  listingId: number;
+  locale: string;
+  promotionTier: 'standard' | 'plus' | 'premium';
+}) {
+  const user = await requireUser();
+  const locale = normalizeLocale(params.locale);
+  const listing = await requireOwnedListing(params.listingId, user.id);
+
+  await db
+    .update(listings)
+    .set({
+      promotionTier: params.promotionTier,
+      paymentStatus: 'paid',
+      paidAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(and(eq(listings.id, params.listingId), eq(listings.ownerId, user.id)));
+
+  revalidateListingViews(locale, params.listingId);
+
+  return { listingId: params.listingId, promotionTier: params.promotionTier, paymentStatus: 'paid' as const };
+}
+
 export async function updateListingStatusAction(params: {
   listingId: number;
   status: 'draft' | 'published';
@@ -452,6 +516,9 @@ export async function updateListingStatusAction(params: {
   const listing = await requireOwnedListing(params.listingId, user.id);
 
   if (params.status === 'published') {
+    if (listing.paymentStatus !== 'paid') {
+      throw new Error('Complete payment before publishing this listing.');
+    }
     if (!listing.title?.trim()) {
       throw new Error('Add a title before publishing the listing');
     }
@@ -580,6 +647,10 @@ const listingSchema = z.object({
       }
       return true;
     }),
+  promotionTier: z
+    .enum(['standard', 'plus', 'premium'])
+    .optional()
+    .transform((value) => value ?? 'standard'),
 });
 
 type ListingSchema = z.infer<typeof listingSchema>;
@@ -607,6 +678,7 @@ const listingFieldNames = [
   'contactPhone',
   'displayEmail',
   'displayPhone',
+  'promotionTier',
 ] as const;
 
 export type ListingFormField = (typeof listingFieldNames)[number];
@@ -652,6 +724,8 @@ function mapListingInput(data: ListingSchema) {
     contactPhone: data.contactPhone ?? null,
     displayEmail: data.displayEmail ?? true,
     displayPhone: data.displayPhone ?? true,
+    promotionTier: data.promotionTier ?? 'standard',
+    paymentStatus: data.status === 'published' ? 'paid' : 'unpaid',
   };
 }
 

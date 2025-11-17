@@ -27,6 +27,7 @@ import {
 import { slugify } from '@/lib/utils/slug';
 import {
   deleteListingImageAction,
+  completeListingPaymentAction,
   saveListingDraftAction,
   updateListingStatusAction,
   uploadListingMediaAction,
@@ -63,6 +64,42 @@ const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
 const STEP_ORDER: ListingStep[] = [...LISTING_STEP_IDS];
 
+const PAYMENT_PLANS = [
+  {
+    id: 'standard' as const,
+    name: 'Standard',
+    price: 9,
+    cadence: 'per listing',
+    perks: ['7-day runtime', 'Visible in search results', 'Basic insights'],
+    badge: 'Good value',
+  },
+  {
+    id: 'plus' as const,
+    name: 'Plus',
+    price: 19,
+    cadence: 'per listing',
+    perks: [
+      '21-day runtime',
+      'Highlighted ad in feeds',
+      'Advanced stats (impressions, clicks, favorites)',
+    ],
+    badge: 'Popular',
+  },
+  {
+    id: 'premium' as const,
+    name: 'Premium',
+    price: 39,
+    cadence: 'per listing',
+    perks: [
+      '45-day runtime',
+      'Top placement & highlight',
+      'Full funnel stats incl. contact conversions',
+      'Priority support',
+    ],
+    badge: 'Best results',
+  },
+];
+
 const STEP_FIELDS: Record<ListingStep, Array<keyof ListingEditorValues>> = {
   metadata: ['title', 'slug', 'description', 'propertyType', 'transactionType'],
   details: [
@@ -84,6 +121,7 @@ const STEP_FIELDS: Record<ListingStep, Array<keyof ListingEditorValues>> = {
   ],
   media: [],
   finishing: ['price', 'currency', 'contactEmail', 'contactPhone', 'displayEmail', 'displayPhone'],
+  payment: ['promotionTier'],
   review: [],
 };
 
@@ -114,6 +152,7 @@ const DEFAULT_VALUES: ListingEditorValues = {
   contactPhone: '',
   displayEmail: true,
   displayPhone: true,
+  promotionTier: 'standard',
 };
 
 interface ListingWizardProps {
@@ -124,6 +163,7 @@ interface ListingWizardProps {
   initialImages?: ListingImageItem[];
   initialStep?: ListingStep;
   mode?: 'create' | 'edit';
+  initialPaymentStatus?: 'unpaid' | 'paid';
 }
 
 type AutosaveState = 'idle' | 'saving' | 'saved' | 'error';
@@ -225,10 +265,14 @@ export function ListingWizard({
   initialImages = [],
   initialStep = 'metadata',
   mode = 'create',
+  initialPaymentStatus = 'unpaid',
 }: ListingWizardProps) {
   const [currentStep, setCurrentStep] = useState<ListingStep>(initialStep);
   const [listingId, setListingId] = useState<number | null>(initialListingId ?? null);
   const [status, setStatus] = useState<'draft' | 'published'>(initialStatus);
+  const [paymentStatus, setPaymentStatus] = useState<'unpaid' | 'paid'>(
+    initialStatus === 'published' ? 'paid' : initialPaymentStatus
+  );
   const [images, setImages] = useState<ListingImageItem[]>(() =>
     [...initialImages].sort((a, b) => a.displayOrder - b.displayOrder)
   );
@@ -238,6 +282,7 @@ export function ListingWizard({
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isStatusUpdating, startStatusTransition] = useTransition();
   const [isUploading, startUploadTransition] = useTransition();
+  const [isPaying, startPaymentTransition] = useTransition();
   const { user } = useCurrentUser();
 
   const defaultValues = useMemo(
@@ -260,6 +305,7 @@ export function ListingWizard({
     details: JSON.stringify(getStepPayload('details', defaultValues) ?? {}),
     media: JSON.stringify({}),
     finishing: JSON.stringify(getStepPayload('finishing', defaultValues) ?? {}),
+    payment: JSON.stringify(getStepPayload('payment', defaultValues) ?? {}),
     review: JSON.stringify({}),
   });
 
@@ -491,8 +537,40 @@ export function ListingWizard({
     });
   };
 
+  const handleCompletePayment = () => {
+    if (!listingId) {
+      setAutoSaveState('error');
+      setAutoSaveError('Save your listing details first, then return to payment.');
+      return;
+    }
+    startPaymentTransition(async () => {
+      try {
+        const result = await completeListingPaymentAction({
+          listingId,
+          locale,
+          promotionTier: form.getValues('promotionTier') ?? 'standard',
+        });
+        form.setValue('promotionTier', result.promotionTier, {
+          shouldDirty: false,
+          shouldTouch: false,
+        });
+        setPaymentStatus(result.paymentStatus);
+        setAutoSaveState('saved');
+        setAutoSaveError(null);
+      } catch (error) {
+        setAutoSaveState('error');
+        setAutoSaveError((error as Error).message);
+      }
+    });
+  };
+
   const handlePublishToggle = (nextStatus: 'draft' | 'published') => {
     if (!listingId) {
+      return;
+    }
+    if (nextStatus === 'published' && paymentStatus !== 'paid') {
+      setAutoSaveState('error');
+      setAutoSaveError('Complete the payment step before publishing.');
       return;
     }
     startStatusTransition(async () => {
@@ -956,6 +1034,105 @@ export function ListingWizard({
             </section>
           )}
 
+          {currentStep === 'payment' && (
+            <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">Choose a plan</h2>
+                  <p className="text-sm text-slate-500">
+                    Publishing an ad requires a paid plan. Pick the tier that matches how much exposure you
+                    want.
+                  </p>
+                  <p className="mt-2 text-xs text-slate-400">
+                    You can keep saving drafts for free (limit 5), but publishing is unlocked after payment.
+                  </p>
+                </div>
+                <div>
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium',
+                      paymentStatus === 'paid'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-orange-50 text-orange-700'
+                    )}
+                  >
+                    {paymentStatus === 'paid' ? 'Payment complete' : 'Payment required before publishing'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-3">
+                {PAYMENT_PLANS.map((plan) => {
+                  const selected = form.watch('promotionTier') === plan.id;
+                  return (
+                    <button
+                      type="button"
+                      key={plan.id}
+                      onClick={() => form.setValue('promotionTier', plan.id)}
+                      className={cn(
+                        'flex h-full flex-col rounded-2xl border p-4 text-left transition hover:border-slate-300',
+                        selected ? 'border-emerald-500 ring-2 ring-emerald-100' : 'border-slate-200'
+                      )}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">{plan.name}</p>
+                          <p className="text-xs text-slate-500">{plan.cadence}</p>
+                        </div>
+                        <div className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-700">
+                          {plan.badge}
+                        </div>
+                      </div>
+                      <p className="mt-3 text-2xl font-semibold text-slate-900">
+                        €{plan.price}
+                        <span className="text-xs font-normal text-slate-500"> / listing</span>
+                      </p>
+                      <ul className="mt-3 space-y-2 text-sm text-slate-600">
+                        {plan.perks.map((perk) => (
+                          <li key={perk} className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                            <span>{perk}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-auto pt-4 text-xs text-slate-500">
+                        {selected ? 'Selected' : 'Click to select this plan'}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <p className="text-sm text-slate-500">
+                  Payment unlocks publishing for this listing. You can change tiers anytime before payment.
+                </p>
+                <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                  <Button
+                    type="button"
+                    variant={paymentStatus === 'paid' ? 'outline' : 'default'}
+                    disabled={paymentStatus === 'paid' || isPaying || !listingId}
+                    onClick={() => handleCompletePayment()}
+                    className="rounded-full"
+                  >
+                    {isPaying ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {paymentStatus === 'paid' ? 'Payment completed' : 'Pay & unlock publishing'}
+                  </Button>
+                  {!listingId && (
+                    <span className="text-xs text-orange-600 md:ml-3">
+                      Save earlier steps first to generate a listing ID.
+                    </span>
+                  )}
+                  {paymentStatus !== 'paid' && (
+                    <span className="text-xs text-slate-500 md:ml-3">
+                      You will be redirected to payment; on success we mark this listing as paid.
+                    </span>
+                  )}
+                </div>
+              </div>
+            </section>
+          )}
+
           {currentStep === 'media' && (
             <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
               <div className="flex flex-col gap-4">
@@ -1128,6 +1305,33 @@ export function ListingWizard({
                   </p>
                 </div>
                 <div className="rounded-2xl border border-slate-100 p-4">
+                  <h3 className="text-sm font-semibold text-slate-900">Payment & plan</h3>
+                  <dl className="mt-3 space-y-2 text-sm text-slate-600">
+                    <div className="flex items-center justify-between">
+                      <dt className="font-medium text-slate-500">Selected tier</dt>
+                      <dd className="capitalize">{form.watch('promotionTier')}</dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="font-medium text-slate-500">Payment</dt>
+                      <dd
+                        className={cn(
+                          'rounded-full px-3 py-1 text-xs font-medium',
+                          paymentStatus === 'paid'
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : 'bg-orange-50 text-orange-700'
+                        )}
+                      >
+                        {paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                      </dd>
+                    </div>
+                    {paymentStatus !== 'paid' && (
+                      <div className="text-xs text-orange-600">
+                        Complete payment in the previous step to enable publishing.
+                      </div>
+                    )}
+                  </dl>
+                </div>
+                <div className="rounded-2xl border border-slate-100 p-4">
                   <h3 className="text-sm font-semibold text-slate-900">Contact preferences</h3>
                   <dl className="mt-3 space-y-2 text-sm text-slate-600">
                     <div className="flex items-center justify-between">
@@ -1154,7 +1358,7 @@ export function ListingWizard({
                 <Button
                   type="button"
                   onClick={() => handlePublishToggle('published')}
-                  disabled={!listingId || isStatusUpdating}
+                  disabled={!listingId || isStatusUpdating || paymentStatus !== 'paid'}
                   className="rounded-full"
                 >
                   {isStatusUpdating && status !== 'published' ? (

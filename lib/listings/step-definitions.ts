@@ -28,6 +28,11 @@ export const LISTING_STEP_DEFINITIONS: ListingStepDefinition[] = [
     description: 'Set pricing and decide how buyers can contact you.',
   },
   {
+    id: 'payment',
+    title: 'Payment',
+    description: 'Choose a tier to promote your ad and proceed to checkout.',
+  },
+  {
     id: 'review',
     title: 'Review & publish',
     description: 'Double-check every section before publishing.',

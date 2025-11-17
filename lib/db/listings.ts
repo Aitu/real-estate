@@ -93,6 +93,8 @@ function mapListingRecord(record: ListingWithRelations): ListingDetail {
     contactPhone: record.displayPhone
       ? record.contactPhone ?? owner.phoneNumber
       : null,
+    promotionTier: record.promotionTier ?? 'standard',
+    paymentStatus: record.paymentStatus ?? 'unpaid',
     displayEmail: record.displayEmail ?? true,
     displayPhone: record.displayPhone ?? true,
     publishedAt: toIsoString(record.publishedAt),
@@ -254,10 +256,10 @@ export async function getListingsForOwner(
   const [records, countResult] = await Promise.all([
     db.query.listings.findMany({
       where: eq(listings.ownerId, ownerId),
-    columns: {
-      id: true,
-      slug: true,
-      title: true,
+      columns: {
+        id: true,
+        slug: true,
+        title: true,
         description: true,
         propertyType: true,
         transactionType: true,
@@ -266,18 +268,21 @@ export async function getListingsForOwner(
         currency: true,
         city: true,
         postalCode: true,
-      country: true,
-      street: true,
-      bedrooms: true,
-      bathrooms: true,
-      area: true,
-      contactEmail: true,
-      contactPhone: true,
-      displayEmail: true,
-      displayPhone: true,
-      publishedAt: true,
-      createdAt: true,
-      updatedAt: true,
+        country: true,
+        street: true,
+        bedrooms: true,
+        bathrooms: true,
+        area: true,
+        contactEmail: true,
+        contactPhone: true,
+        displayEmail: true,
+        displayPhone: true,
+        promotionTier: true,
+        paymentStatus: true,
+        paidAt: true,
+        publishedAt: true,
+        createdAt: true,
+        updatedAt: true,
       },
       orderBy: (fields, operators) => {
         switch (sort) {
@@ -315,6 +320,8 @@ export async function getListingsForOwner(
     contactPhone: record.contactPhone,
     displayEmail: record.displayEmail ?? true,
     displayPhone: record.displayPhone ?? true,
+    promotionTier: record.promotionTier ?? 'standard',
+    paymentStatus: record.paymentStatus ?? 'unpaid',
   } satisfies OwnerListing));
 
   return { listings: mapped, totalCount };
@@ -339,6 +346,8 @@ type ListingInput = {
   contactPhone: string | null;
   displayEmail: boolean;
   displayPhone: boolean;
+  promotionTier?: 'standard' | 'plus' | 'premium';
+  paymentStatus?: 'paid' | 'unpaid';
 };
 
 export async function createListingForOwner(
@@ -372,6 +381,10 @@ export async function createListingForOwner(
       contactPhone: input.contactPhone,
       displayEmail: input.displayEmail,
       displayPhone: input.displayPhone,
+      promotionTier: input.promotionTier ?? 'standard',
+      paymentStatus:
+        input.paymentStatus ?? (input.status === 'published' ? 'paid' : 'unpaid'),
+      paidAt: input.paymentStatus === 'paid' || input.status === 'published' ? new Date() : null,
       publishedAt,
     })
     .returning();
@@ -401,6 +414,8 @@ export async function createListingForOwner(
     contactPhone: created.contactPhone,
     displayEmail: created.displayEmail ?? true,
     displayPhone: created.displayPhone ?? true,
+    promotionTier: created.promotionTier ?? 'standard',
+    paymentStatus: created.paymentStatus ?? 'unpaid',
     publishedAt: created.publishedAt
       ? created.publishedAt.toISOString()
       : null,
@@ -449,6 +464,13 @@ export async function updateListingForOwner(
       contactPhone: input.contactPhone,
       displayEmail: input.displayEmail,
       displayPhone: input.displayPhone,
+      promotionTier: input.promotionTier ?? 'standard',
+      paymentStatus:
+        input.paymentStatus ?? (input.status === 'published' ? 'paid' : 'unpaid'),
+      paidAt:
+        input.paymentStatus === 'paid' || input.status === 'published'
+          ? existing.publishedAt ?? new Date()
+          : null,
       updatedAt: new Date(),
       publishedAt: publishedAtValue,
     })
@@ -480,6 +502,8 @@ export async function updateListingForOwner(
     contactPhone: updated.contactPhone,
     displayEmail: updated.displayEmail ?? true,
     displayPhone: updated.displayPhone ?? true,
+    promotionTier: updated.promotionTier ?? 'standard',
+    paymentStatus: updated.paymentStatus ?? 'unpaid',
     publishedAt: updated.publishedAt
       ? updated.publishedAt.toISOString()
       : null,
