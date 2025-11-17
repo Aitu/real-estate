@@ -289,14 +289,16 @@ export default async function ListingDetailPage({
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                     {t('contactEmail')}
                   </dt>
-                  <dd className="text-sm text-slate-700">{listing.owner.email}</dd>
+                  <dd className="text-sm text-slate-700">
+                    {listing.contactEmail ?? t('contactUnavailable')}
+                  </dd>
                 </div>
                 <div className="flex flex-col gap-1">
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                     {t('contactPhone')}
                   </dt>
                   <dd className="text-sm text-slate-700">
-                    {listing.owner.phoneNumber ?? t('contactUnavailable')}
+                    {listing.contactPhone ?? t('contactUnavailable')}
                   </dd>
                 </div>
               </dl>

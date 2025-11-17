@@ -84,7 +84,31 @@ export const listingDetailsSchema = z.object({
     .optional(),
 });
 
-export const listingPricingSchema = z.object({
+const optionalEmail = z
+  .string()
+  .email('Enter a valid email address')
+  .max(255, 'Email is too long')
+  .optional()
+  .nullable()
+  .transform((value) => {
+    if (!value) return null;
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  });
+
+const optionalPhone = z
+  .string()
+  .trim()
+  .max(32, 'Phone number is too long')
+  .optional()
+  .nullable()
+  .transform((value) => {
+    if (!value) return null;
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  });
+
+export const listingFinishingSchema = z.object({
   price: z
     .number({ invalid_type_error: 'Price must be a number' })
     .min(0, 'Price cannot be negative'),
@@ -92,6 +116,10 @@ export const listingPricingSchema = z.object({
     .string({ required_error: 'Currency is required' })
     .trim()
     .length(3, 'Currency must be a three-letter code'),
+  contactEmail: optionalEmail,
+  contactPhone: optionalPhone,
+  displayEmail: z.boolean().default(true),
+  displayPhone: z.boolean().default(true),
 });
 
 export const listingEditorSchema = listingMetadataSchema
@@ -100,11 +128,11 @@ export const listingEditorSchema = listingMetadataSchema
     description: listingMetadataSchema.shape.description,
   })
   .merge(listingDetailsSchema)
-  .merge(listingPricingSchema);
+  .merge(listingFinishingSchema);
 
 export type ListingMetadataInput = z.infer<typeof listingMetadataSchema>;
 export type ListingDetailsInput = z.infer<typeof listingDetailsSchema>;
-export type ListingPricingInput = z.infer<typeof listingPricingSchema>;
+export type ListingFinishingInput = z.infer<typeof listingFinishingSchema>;
 export type ListingEditorValues = z.infer<typeof listingEditorSchema>;
 
-export type ListingStep = 'metadata' | 'details' | 'pricing' | 'media' | 'review';
+export type ListingStep = 'metadata' | 'details' | 'media' | 'finishing' | 'review';

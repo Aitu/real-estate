@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Bath, BedDouble, ChevronLeft, ChevronRight, Heart, MapPin, Ruler } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ListingSummary } from '@/lib/types/listing';

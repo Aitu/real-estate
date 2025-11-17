@@ -87,6 +87,14 @@ function mapListingRecord(record: ListingWithRelations): ListingDetail {
       avatarUrl: owner.avatarUrl,
       locale: owner.locale,
     },
+    contactEmail: record.displayEmail
+      ? record.contactEmail ?? owner.email
+      : null,
+    contactPhone: record.displayPhone
+      ? record.contactPhone ?? owner.phoneNumber
+      : null,
+    displayEmail: record.displayEmail ?? true,
+    displayPhone: record.displayPhone ?? true,
     publishedAt: toIsoString(record.publishedAt),
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
@@ -246,10 +254,10 @@ export async function getListingsForOwner(
   const [records, countResult] = await Promise.all([
     db.query.listings.findMany({
       where: eq(listings.ownerId, ownerId),
-      columns: {
-        id: true,
-        slug: true,
-        title: true,
+    columns: {
+      id: true,
+      slug: true,
+      title: true,
         description: true,
         propertyType: true,
         transactionType: true,
@@ -258,14 +266,18 @@ export async function getListingsForOwner(
         currency: true,
         city: true,
         postalCode: true,
-        country: true,
-        street: true,
-        bedrooms: true,
-        bathrooms: true,
-        area: true,
-        publishedAt: true,
-        createdAt: true,
-        updatedAt: true,
+      country: true,
+      street: true,
+      bedrooms: true,
+      bathrooms: true,
+      area: true,
+      contactEmail: true,
+      contactPhone: true,
+      displayEmail: true,
+      displayPhone: true,
+      publishedAt: true,
+      createdAt: true,
+      updatedAt: true,
       },
       orderBy: (fields, operators) => {
         switch (sort) {
@@ -299,6 +311,10 @@ export async function getListingsForOwner(
     publishedAt: record.publishedAt ? record.publishedAt.toISOString() : null,
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
+    contactEmail: record.contactEmail,
+    contactPhone: record.contactPhone,
+    displayEmail: record.displayEmail ?? true,
+    displayPhone: record.displayPhone ?? true,
   } satisfies OwnerListing));
 
   return { listings: mapped, totalCount };
@@ -319,6 +335,10 @@ type ListingInput = {
   bedrooms: number | null;
   bathrooms: number | null;
   area: number | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  displayEmail: boolean;
+  displayPhone: boolean;
 };
 
 export async function createListingForOwner(
@@ -348,6 +368,10 @@ export async function createListingForOwner(
       bedrooms: input.bedrooms,
       bathrooms: input.bathrooms,
       area: input.area,
+      contactEmail: input.contactEmail,
+      contactPhone: input.contactPhone,
+      displayEmail: input.displayEmail,
+      displayPhone: input.displayPhone,
       publishedAt,
     })
     .returning();
@@ -373,6 +397,10 @@ export async function createListingForOwner(
     bedrooms: created.bedrooms,
     bathrooms: created.bathrooms,
     area: created.area,
+    contactEmail: created.contactEmail,
+    contactPhone: created.contactPhone,
+    displayEmail: created.displayEmail ?? true,
+    displayPhone: created.displayPhone ?? true,
     publishedAt: created.publishedAt
       ? created.publishedAt.toISOString()
       : null,
@@ -417,6 +445,10 @@ export async function updateListingForOwner(
       bedrooms: input.bedrooms,
       bathrooms: input.bathrooms,
       area: input.area,
+      contactEmail: input.contactEmail,
+      contactPhone: input.contactPhone,
+      displayEmail: input.displayEmail,
+      displayPhone: input.displayPhone,
       updatedAt: new Date(),
       publishedAt: publishedAtValue,
     })
@@ -444,6 +476,10 @@ export async function updateListingForOwner(
     bedrooms: updated.bedrooms,
     bathrooms: updated.bathrooms,
     area: updated.area,
+    contactEmail: updated.contactEmail,
+    contactPhone: updated.contactPhone,
+    displayEmail: updated.displayEmail ?? true,
+    displayPhone: updated.displayPhone ?? true,
     publishedAt: updated.publishedAt
       ? updated.publishedAt.toISOString()
       : null,

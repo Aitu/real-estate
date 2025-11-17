@@ -10,11 +10,11 @@ import { getUser } from '@/lib/db/queries';
 import {
   ListingDetailsInput,
   ListingMetadataInput,
-  ListingPricingInput,
+  ListingFinishingInput,
   ListingStep,
   listingDetailsSchema,
   listingMetadataSchema,
-  listingPricingSchema,
+  listingFinishingSchema,
 } from '@/lib/validation/listing';
 import { generateDraftSlug, slugify } from '@/lib/utils/slug';
 import { isLocale, type Locale } from '@/lib/i18n/config';
@@ -167,6 +167,10 @@ function mapMetadataToInsert(
     country: 'LU',
     latitude: null,
     longitude: null,
+    contactEmail: null,
+    contactPhone: null,
+    displayEmail: true,
+    displayPhone: true,
     createdAt: now,
     updatedAt: now,
   };
@@ -204,10 +208,14 @@ function mapDetailsToUpdate(parsed: ListingDetailsInput) {
   };
 }
 
-function mapPricingToUpdate(parsed: ListingPricingInput) {
+function mapFinishingToUpdate(parsed: ListingFinishingInput) {
   return {
     price: Math.round(parsed.price),
     currency: parsed.currency.toUpperCase(),
+    contactEmail: parsed.contactEmail ?? null,
+    contactPhone: parsed.contactPhone ?? null,
+    displayEmail: parsed.displayEmail ?? true,
+    displayPhone: parsed.displayPhone ?? true,
     updatedAt: new Date(),
   };
 }
@@ -302,11 +310,11 @@ export async function saveListingDraftAction(
     };
   }
 
-  if (input.step === 'pricing') {
-    const parsed = listingPricingSchema.parse(input.values);
+  if (input.step === 'finishing') {
+    const parsed = listingFinishingSchema.parse(input.values);
     await db
       .update(listings)
-      .set(mapPricingToUpdate(parsed))
+      .set(mapFinishingToUpdate(parsed))
       .where(and(eq(listings.id, input.listingId), eq(listings.ownerId, user.id)));
 
     revalidateListingViews(locale, input.listingId);
@@ -315,7 +323,7 @@ export async function saveListingDraftAction(
       listingId: input.listingId,
       slug: '',
       status: 'updated',
-      step: 'pricing',
+      step: 'finishing',
       savedAt: now.toISOString(),
     };
   }
@@ -492,6 +500,32 @@ const optionalNumericField = z
   })
   .refine((value) => value === null || !Number.isNaN(value), 'Invalid number');
 
+const optionalEmailField = z
+  .string()
+  .optional()
+  .transform((value) => {
+    if (!value) return null;
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  })
+  .refine(
+    (value) => value === null || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+    'Enter a valid email'
+  );
+
+const optionalPhoneField = z
+  .string()
+  .optional()
+  .transform((value) => {
+    if (!value) return null;
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  })
+  .refine(
+    (value) => value === null || value.length <= 32,
+    'Phone number is too long'
+  );
+
 const listingSchema = z.object({
   locale: z.string().min(2).max(5),
   title: z.string().min(3).max(180),
@@ -522,6 +556,30 @@ const listingSchema = z.object({
   bedrooms: optionalNumericField,
   bathrooms: optionalNumericField,
   area: optionalNumericField,
+  contactEmail: optionalEmailField,
+  contactPhone: optionalPhoneField,
+  displayEmail: z
+    .union([z.boolean(), z.string()])
+    .optional()
+    .transform((value) => {
+      if (typeof value === 'boolean') return value;
+      if (typeof value === 'string') {
+        if (value === '') return true;
+        return value === 'true';
+      }
+      return true;
+    }),
+  displayPhone: z
+    .union([z.boolean(), z.string()])
+    .optional()
+    .transform((value) => {
+      if (typeof value === 'boolean') return value;
+      if (typeof value === 'string') {
+        if (value === '') return true;
+        return value === 'true';
+      }
+      return true;
+    }),
 });
 
 type ListingSchema = z.infer<typeof listingSchema>;
@@ -545,6 +603,10 @@ const listingFieldNames = [
   'bedrooms',
   'bathrooms',
   'area',
+  'contactEmail',
+  'contactPhone',
+  'displayEmail',
+  'displayPhone',
 ] as const;
 
 export type ListingFormField = (typeof listingFieldNames)[number];
@@ -586,6 +648,10 @@ function mapListingInput(data: ListingSchema) {
     bedrooms: data.bedrooms,
     bathrooms: data.bathrooms,
     area: data.area,
+    contactEmail: data.contactEmail ?? null,
+    contactPhone: data.contactPhone ?? null,
+    displayEmail: data.displayEmail ?? true,
+    displayPhone: data.displayPhone ?? true,
   };
 }
 

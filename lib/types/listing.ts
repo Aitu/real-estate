@@ -93,6 +93,10 @@ export interface ListingDetail {
     avatarUrl: string | null;
     locale: string | null;
   };
+  contactEmail: string | null;
+  contactPhone: string | null;
+  displayEmail: boolean;
+  displayPhone: boolean;
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -120,4 +124,8 @@ export interface OwnerListing {
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  displayEmail?: boolean;
+  displayPhone?: boolean;
 }

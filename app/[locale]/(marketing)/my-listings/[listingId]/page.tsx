@@ -34,6 +34,10 @@ function mapDetailToEditorValues(detail: Awaited<ReturnType<typeof getListingDet
     longitude: detail.location.coordinates.lng,
     price: detail.price,
     currency: detail.currency ?? 'EUR',
+    contactEmail: detail.contactEmail ?? '',
+    contactPhone: detail.contactPhone ?? '',
+    displayEmail: detail.displayEmail ?? true,
+    displayPhone: detail.displayPhone ?? true,
   };
 }
 

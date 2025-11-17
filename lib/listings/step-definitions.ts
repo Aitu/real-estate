@@ -18,14 +18,14 @@ export const LISTING_STEP_DEFINITIONS: ListingStepDefinition[] = [
     description: 'Provide location and amenity information.',
   },
   {
-    id: 'pricing',
-    title: 'Pricing',
-    description: 'Set the pricing details and currency.',
-  },
-  {
     id: 'media',
     title: 'Media',
     description: 'Upload high quality photos to showcase the listing.',
+  },
+  {
+    id: 'finishing',
+    title: 'Finishing touches',
+    description: 'Set pricing and decide how buyers can contact you.',
   },
   {
     id: 'review',

@@ -33,6 +33,8 @@ import {
 } from '@/app/[locale]/(marketing)/my-listings/actions';
 import type { Locale } from '@/lib/i18n/config';
 import { LISTING_STEP_DEFINITIONS, LISTING_STEP_IDS } from '@/lib/listings/step-definitions';
+import { cn } from '@/lib/utils';
+import { useCurrentUser } from '@/hooks/use-current-user';
 
 type ListingImageItem = {
   id: number;
@@ -80,8 +82,8 @@ const STEP_FIELDS: Record<ListingStep, Array<keyof ListingEditorValues>> = {
     'latitude',
     'longitude',
   ],
-  pricing: ['price', 'currency'],
   media: [],
+  finishing: ['price', 'currency', 'contactEmail', 'contactPhone', 'displayEmail', 'displayPhone'],
   review: [],
 };
 
@@ -108,6 +110,10 @@ const DEFAULT_VALUES: ListingEditorValues = {
   longitude: null,
   price: 0,
   currency: 'EUR',
+  contactEmail: '',
+  contactPhone: '',
+  displayEmail: true,
+  displayPhone: true,
 };
 
 interface ListingWizardProps {
@@ -147,7 +153,7 @@ function shouldAutosave(step: ListingStep, payload: Record<string, unknown> | nu
     const title = (payload.title as string | undefined)?.trim();
     return Boolean(title && title.length >= 3);
   }
-  if (step === 'pricing') {
+  if (step === 'finishing') {
     const price = payload.price as number | undefined;
     return typeof price === 'number' && price >= 0;
   }
@@ -167,6 +173,36 @@ function mergeInitialValues(
     postalCode: initial?.postalCode ?? DEFAULT_VALUES.postalCode,
     country: initial?.country ?? DEFAULT_VALUES.country,
   };
+}
+
+function VisibilityToggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={cn(
+        'relative inline-flex h-6 w-11 items-center rounded-full border transition-colors',
+        checked
+          ? 'border-emerald-300 bg-emerald-500/80'
+          : 'border-slate-200 bg-slate-200'
+      )}
+    >
+      <span
+        className={cn(
+          'inline-block h-4 w-4 rounded-full bg-white shadow transition-transform',
+          checked ? 'translate-x-5' : 'translate-x-1'
+        )}
+      />
+    </button>
+  );
 }
 
 function formatSavedAt(timestamp: string | null): string | null {
@@ -202,6 +238,7 @@ export function ListingWizard({
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isStatusUpdating, startStatusTransition] = useTransition();
   const [isUploading, startUploadTransition] = useTransition();
+  const { user } = useCurrentUser();
 
   const defaultValues = useMemo(
     () => mergeInitialValues(initialValues),
@@ -221,8 +258,8 @@ export function ListingWizard({
   const lastSavedByStepRef = useRef<Record<ListingStep, string>>({
     metadata: JSON.stringify(getStepPayload('metadata', defaultValues) ?? {}),
     details: JSON.stringify(getStepPayload('details', defaultValues) ?? {}),
-    pricing: JSON.stringify(getStepPayload('pricing', defaultValues) ?? {}),
     media: JSON.stringify({}),
+    finishing: JSON.stringify(getStepPayload('finishing', defaultValues) ?? {}),
     review: JSON.stringify({}),
   });
 
@@ -230,6 +267,21 @@ export function ListingWizard({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [isSavingDraft, startDraftTransition] = useTransition();
+
+  useEffect(() => {
+    if (user?.email && !form.getValues('contactEmail')) {
+      form.setValue('contactEmail', user.email, {
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+    }
+    if (user?.phoneNumber && !form.getValues('contactPhone')) {
+      form.setValue('contactPhone', user.phoneNumber, {
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+    }
+  }, [user, form]);
 
   useEffect(() => {
     return () => {
@@ -778,7 +830,7 @@ export function ListingWizard({
             </section>
           )}
 
-          {currentStep === 'pricing' && (
+          {currentStep === 'finishing' && (
             <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
               <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
                 <Controller
@@ -821,6 +873,82 @@ export function ListingWizard({
                         </Select>
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="mt-8 grid gap-6 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="contactEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact email (optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="you@example.com"
+                          value={field.value ?? ''}
+                          onChange={(event) => field.onChange(event.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="contactPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact phone (optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="tel"
+                          placeholder="+352 123 456"
+                          value={field.value ?? ''}
+                          onChange={(event) => field.onChange(event.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="displayEmail"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col gap-2 rounded-2xl border border-slate-200 px-4 py-3">
+                      <div>
+                        <FormLabel>Show email on listing</FormLabel>
+                        <p className="text-xs text-slate-500">
+                          Buyers will see your email address when this is enabled.
+                        </p>
+                      </div>
+                      <FormControl>
+                        <VisibilityToggle checked={field.value} onChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="displayPhone"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col gap-2 rounded-2xl border border-slate-200 px-4 py-3">
+                      <div>
+                        <FormLabel>Show phone on listing</FormLabel>
+                        <p className="text-xs text-slate-500">
+                          Toggle to display your phone number to interested buyers.
+                        </p>
+                      </div>
+                      <FormControl>
+                        <VisibilityToggle checked={field.value} onChange={field.onChange} />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -999,13 +1127,34 @@ export function ListingWizard({
                       : 'No photos uploaded yet.'}
                   </p>
                 </div>
+                <div className="rounded-2xl border border-slate-100 p-4">
+                  <h3 className="text-sm font-semibold text-slate-900">Contact preferences</h3>
+                  <dl className="mt-3 space-y-2 text-sm text-slate-600">
+                    <div className="flex items-center justify-between">
+                      <dt className="font-medium text-slate-500">Email</dt>
+                      <dd>
+                        {watchedValues.displayEmail
+                          ? watchedValues.contactEmail || user?.email || 'Account email'
+                          : 'Hidden'}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="font-medium text-slate-500">Phone</dt>
+                      <dd>
+                        {watchedValues.displayPhone
+                          ? watchedValues.contactPhone || user?.phoneNumber || 'Not provided'
+                          : 'Hidden'}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-3 pt-4">
                 <Button
                   type="button"
                   onClick={() => handlePublishToggle('published')}
-                  disabled={!listingId || status === 'published' || isStatusUpdating}
+                  disabled={!listingId || isStatusUpdating}
                   className="rounded-full"
                 >
                   {isStatusUpdating && status !== 'published' ? (
@@ -1017,7 +1166,7 @@ export function ListingWizard({
                   type="button"
                   variant="outline"
                   onClick={() => handlePublishToggle('draft')}
-                  disabled={!listingId || status === 'draft' || isStatusUpdating}
+                  disabled={!listingId || isStatusUpdating}
                   className="rounded-full"
                 >
                   {isStatusUpdating && status === 'published' ? (
