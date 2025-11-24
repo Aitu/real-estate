@@ -350,8 +350,14 @@
         "view": "Voir l’annonce",
         "edit": "Modifier",
         "deactivate": "Désactiver",
-        "deactivatePending": "Désactivation…",
-        "confirmDeactivate": "Voulez-vous vraiment désactiver cette annonce ?"
+        "deactivatePending": "Désactivation...",
+        "confirmDeactivate": "Voulez-vous vraiment désactiver cette annonce ?",
+        "delete": "Supprimer",
+        "deletePending": "Suppression...",
+        "confirmDelete": "Supprimer cette annonce ?",
+        "reactivate": "Réactiver",
+        "reactivatePending": "Réactivation...",
+        "confirmReactivate": "Réactiver cette annonce ?"
       },
       "noResults": "Vous n’avez pas encore créé d’annonce.",
       "stats": {
@@ -463,12 +469,19 @@
     "errors": {
       "create": "Impossible de créer l'annonce. Veuillez réessayer.",
       "update": "Impossible de mettre à jour l'annonce. Veuillez réessayer.",
-      "deactivate": "Impossible de désactiver l'annonce. Veuillez réessayer."
+      "deactivate": "Impossible de désactiver l'annonce. Veuillez réessayer.",
+      "deactivateNotAllowed": "Seules les annonces publiées peuvent être désactivées.",
+      "delete": "Impossible de supprimer l'annonce. Veuillez réessayer.",
+      "deleteNotAllowed": "Seules les annonces en brouillon ou inactives peuvent être supprimées.",
+      "reactivate": "Impossible de réactiver l'annonce. Veuillez réessayer.",
+      "reactivateNotAllowed": "Seules les annonces inactives peuvent être réactivées."
     },
     "messages": {
       "createSuccess": "Annonce créée avec succès.",
       "updateSuccess": "Annonce mise à jour avec succès.",
-      "deactivateSuccess": "Annonce désactivée."
+      "deactivateSuccess": "Annonce désactivée.",
+      "deleteSuccess": "Annonce supprimée.",
+      "reactivateSuccess": "Annonce réactivée."
     }
   }
 }

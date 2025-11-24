@@ -6,11 +6,11 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import type { OwnerListing, ListingStatus } from '@/lib/types/listing';
-import { deactivateListing } from './actions';
+import { deactivateListing, deleteListing, reactivateListing } from './actions';
 import type { ActionState } from '@/lib/auth/middleware';
 import type { OwnerListingSort } from '@/lib/db/listings';
 import { useFormStatus } from 'react-dom';
-import { Eye, Heart, Loader2, PencilLine, PhoneCall, Power } from 'lucide-react';
+import { Eye, Heart, Loader2, PencilLine, PhoneCall, Power, Trash2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 const STATUS_BADGE_STYLES: Record<ListingStatus, string> = {
@@ -19,11 +19,11 @@ const STATUS_BADGE_STYLES: Record<ListingStatus, string> = {
   inactive: 'bg-slate-100 text-slate-600 border-slate-200',
 };
 
-const ACTION_ICON_CLASS =
-  'inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition hover:text-slate-900 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-300';
-
-const ACTION_ICON_DESTRUCTIVE_CLASS =
-  'inline-flex h-8 w-8 items-center justify-center rounded-full text-rose-500 transition hover:text-rose-600 hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-200';
+const ACTION_ICON_BASE_CLASS =
+  'inline-flex h-8 w-8 items-center justify-center rounded-full transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2';
+const ACTION_ICON_NEUTRAL_CLASS = `${ACTION_ICON_BASE_CLASS} text-slate-500 hover:text-slate-900 hover:bg-slate-100 focus-visible:outline-slate-300`;
+const ACTION_ICON_DESTRUCTIVE_CLASS = `${ACTION_ICON_BASE_CLASS} text-rose-500 hover:text-rose-600 hover:bg-rose-50 focus-visible:outline-rose-200`;
+const ACTION_ICON_POSITIVE_CLASS = `${ACTION_ICON_BASE_CLASS} text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 focus-visible:outline-emerald-200`;
 
 export type MyListingsCopy = {
   heading: { title: string; subtitle: string };
@@ -42,6 +42,12 @@ export type MyListingsCopy = {
     deactivate: string;
     deactivatePending: string;
     confirmDeactivate: string;
+    delete: string;
+    deletePending: string;
+    confirmDelete: string;
+    reactivate: string;
+    reactivatePending: string;
+    confirmReactivate: string;
     noResults: string;
   };
   statusLabels: Record<ListingStatus, string>;
@@ -111,43 +117,151 @@ function DeactivateListingForm({
   confirmMessage: string;
   icon: LucideIcon;
 }) {
-  const [, formAction] = useActionState<ActionState, FormData>(
-    deactivateListing,
-    {}
+  return (
+    <ListingActionForm
+      action={deactivateListing}
+      listingId={listingId}
+      locale={locale}
+      label={label}
+      pendingLabel={pendingLabel}
+      confirmMessage={confirmMessage}
+      icon={icon}
+      tone="danger"
+    />
   );
+}
+
+function DeleteListingForm({
+  listingId,
+  locale,
+  label,
+  pendingLabel,
+  confirmMessage,
+  icon,
+}: {
+  listingId: number;
+  locale: string;
+  label: string;
+  pendingLabel: string;
+  confirmMessage: string;
+  icon: LucideIcon;
+}) {
+  return (
+    <ListingActionForm
+      action={deleteListing}
+      listingId={listingId}
+      locale={locale}
+      label={label}
+      pendingLabel={pendingLabel}
+      confirmMessage={confirmMessage}
+      icon={icon}
+      tone="danger"
+    />
+  );
+}
+
+function ReactivateListingForm({
+  listingId,
+  locale,
+  label,
+  pendingLabel,
+  confirmMessage,
+  icon,
+}: {
+  listingId: number;
+  locale: string;
+  label: string;
+  pendingLabel: string;
+  confirmMessage: string;
+  icon: LucideIcon;
+}) {
+  return (
+    <ListingActionForm
+      action={reactivateListing}
+      listingId={listingId}
+      locale={locale}
+      label={label}
+      pendingLabel={pendingLabel}
+      confirmMessage={confirmMessage}
+      icon={icon}
+      tone="positive"
+    />
+  );
+}
+
+type ActionTone = 'neutral' | 'danger' | 'positive';
+type ListingActionHandler = (
+  previousState: ActionState,
+  formData: FormData
+) => Promise<ActionState>;
+
+function ListingActionForm({
+  action,
+  listingId,
+  locale,
+  label,
+  pendingLabel,
+  confirmMessage,
+  icon,
+  tone = 'neutral',
+}: {
+  action: ListingActionHandler;
+  listingId: number;
+  locale: string;
+  label: string;
+  pendingLabel: string;
+  confirmMessage?: string;
+  icon: LucideIcon;
+  tone?: ActionTone;
+}) {
+  const [, formAction] = useActionState<ActionState, FormData>(action, {});
 
   return (
     <form
       action={formAction}
       onSubmit={(event) => {
-        if (!window.confirm(confirmMessage)) {
+        if (confirmMessage && !window.confirm(confirmMessage)) {
           event.preventDefault();
         }
       }}
     >
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="listingId" value={listingId} />
-      <DeactivateButton label={label} pendingLabel={pendingLabel} icon={icon} />
+      <ActionIconButton
+        label={label}
+        pendingLabel={pendingLabel}
+        icon={icon}
+        tone={tone}
+      />
     </form>
   );
 }
 
-function DeactivateButton({
+function ActionIconButton({
   label,
   pendingLabel,
   icon: Icon,
+  tone = 'neutral',
 }: {
   label: string;
   pendingLabel: string;
   icon: LucideIcon;
+  tone?: ActionTone;
 }) {
   const { pending } = useFormStatus();
+  const toneClass =
+    tone === 'danger'
+      ? ACTION_ICON_DESTRUCTIVE_CLASS
+      : tone === 'positive'
+        ? ACTION_ICON_POSITIVE_CLASS
+        : ACTION_ICON_NEUTRAL_CLASS;
+
   return (
     <button
       type="submit"
       aria-label={label}
       title={pending ? pendingLabel : label}
-      className={`${ACTION_ICON_DESTRUCTIVE_CLASS} ${pending ? 'cursor-not-allowed opacity-60' : ''}`}
+      className={`${toneClass} ${pending ? 'cursor-not-allowed opacity-60' : ''}`}
       disabled={pending}
     >
       {pending ? (
@@ -173,7 +287,7 @@ function ActionIconLink({
       href={href}
       aria-label={label}
       title={label}
-      className={ACTION_ICON_CLASS}
+      className={ACTION_ICON_NEUTRAL_CLASS}
     >
       <Icon className="h-4 w-4" aria-hidden="true" />
     </Link>
@@ -292,6 +406,9 @@ export function MyListingsManager({
                 const statusLabel = copy.statusLabels[listing.status] ?? listing.status;
                 const propertyTypeLabel =
                   copy.propertyTypeLabels[listing.propertyType] ?? listing.propertyType;
+                const isPublished = listing.status === 'published';
+                const isInactive = listing.status === 'inactive';
+                const canDelete = listing.status === 'draft' || isInactive;
                 return (
                   <tr key={listing.id}>
                     <td className="px-4 py-4 align-top">
@@ -350,14 +467,36 @@ export function MyListingsManager({
                           label={copy.table.edit}
                           icon={PencilLine}
                         />
-                        <DeactivateListingForm
-                          listingId={listing.id}
-                          locale={locale}
-                          label={copy.table.deactivate}
-                          pendingLabel={copy.table.deactivatePending}
-                          confirmMessage={copy.table.confirmDeactivate}
-                          icon={Power}
-                        />
+                        {isInactive ? (
+                          <ReactivateListingForm
+                            listingId={listing.id}
+                            locale={locale}
+                            label={copy.table.reactivate}
+                            pendingLabel={copy.table.reactivatePending}
+                            confirmMessage={copy.table.confirmReactivate}
+                            icon={Power}
+                          />
+                        ) : null}
+                        {isPublished ? (
+                          <DeactivateListingForm
+                            listingId={listing.id}
+                            locale={locale}
+                            label={copy.table.deactivate}
+                            pendingLabel={copy.table.deactivatePending}
+                            confirmMessage={copy.table.confirmDeactivate}
+                            icon={Power}
+                          />
+                        ) : null}
+                        {canDelete ? (
+                          <DeleteListingForm
+                            listingId={listing.id}
+                            locale={locale}
+                            label={copy.table.delete}
+                            pendingLabel={copy.table.deletePending}
+                            confirmMessage={copy.table.confirmDelete}
+                            icon={Trash2}
+                          />
+                        ) : null}
                       </div>
                     </td>
                   </tr>

@@ -350,8 +350,14 @@
         "view": "Inserat ansehen",
         "edit": "Bearbeiten",
         "deactivate": "Deaktivieren",
-        "deactivatePending": "Deaktivierung…",
-        "confirmDeactivate": "Möchten Sie dieses Inserat wirklich deaktivieren?"
+        "deactivatePending": "Deaktivierung...",
+        "confirmDeactivate": "Moechten Sie dieses Inserat wirklich deaktivieren?",
+        "delete": "Loeschen",
+        "deletePending": "Loeschen...",
+        "confirmDelete": "Dieses Inserat endgueltig loeschen?",
+        "reactivate": "Reaktivieren",
+        "reactivatePending": "Reaktivieren...",
+        "confirmReactivate": "Dieses Inserat reaktivieren?"
       },
       "noResults": "Sie haben noch keine Inserate erstellt.",
       "stats": {
@@ -463,12 +469,19 @@
     "errors": {
       "create": "Das Inserat konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
       "update": "Das Inserat konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
-      "deactivate": "Das Inserat konnte nicht deaktiviert werden. Bitte versuchen Sie es erneut."
+      "deactivate": "Das Inserat konnte nicht deaktiviert werden. Bitte versuchen Sie es erneut.",
+      "deactivateNotAllowed": "Nur veroeffentlichte Inserate koennen deaktiviert werden.",
+      "delete": "Das Inserat konnte nicht geloescht werden. Bitte versuchen Sie es erneut.",
+      "deleteNotAllowed": "Nur Entwuerfe oder inaktive Inserate koennen geloescht werden.",
+      "reactivate": "Das Inserat konnte nicht reaktiviert werden. Bitte versuchen Sie es erneut.",
+      "reactivateNotAllowed": "Nur inaktive Inserate koennen reaktiviert werden."
     },
     "messages": {
       "createSuccess": "Inserat erfolgreich erstellt.",
       "updateSuccess": "Inserat erfolgreich aktualisiert.",
-      "deactivateSuccess": "Inserat deaktiviert."
+      "deactivateSuccess": "Inserat deaktiviert.",
+      "deleteSuccess": "Inserat geloescht.",
+      "reactivateSuccess": "Inserat reaktiviert."
     }
   }
 }

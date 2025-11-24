@@ -411,7 +411,13 @@
         "edit": "Edit",
         "deactivate": "Deactivate",
         "deactivatePending": "Deactivating…",
-        "confirmDeactivate": "Are you sure you want to deactivate this listing?"
+        "confirmDeactivate": "Are you sure you want to deactivate this listing?",
+        "delete": "Delete",
+        "deletePending": "Deleting...",
+        "confirmDelete": "Delete this listing?",
+        "reactivate": "Reactivate",
+        "reactivatePending": "Reactivating...",
+        "confirmReactivate": "Reactivate this listing?"
       },
       "noResults": "You haven't created any listings yet.",
       "stats": {
@@ -523,12 +529,19 @@
     "errors": {
       "create": "We couldn't create the listing. Please try again.",
       "update": "We couldn't update the listing. Please try again.",
-      "deactivate": "We couldn't deactivate the listing. Please try again."
+      "deactivate": "We couldn't deactivate the listing. Please try again.",
+      "deactivateNotAllowed": "Only published listings can be deactivated.",
+      "delete": "We couldn't delete the listing. Please try again.",
+      "deleteNotAllowed": "Only draft or inactive listings can be deleted.",
+      "reactivate": "We couldn't reactivate the listing. Please try again.",
+      "reactivateNotAllowed": "Only inactive listings can be reactivated."
     },
     "messages": {
       "createSuccess": "Listing created successfully.",
       "updateSuccess": "Listing updated successfully.",
-      "deactivateSuccess": "Listing deactivated."
+      "deactivateSuccess": "Listing deactivated.",
+      "deleteSuccess": "Listing deleted.",
+      "reactivateSuccess": "Listing reactivated."
     }
   }
 }

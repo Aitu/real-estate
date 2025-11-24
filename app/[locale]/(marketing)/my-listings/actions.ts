@@ -791,6 +791,11 @@ export const deactivateListing = validatedActionWithUser(
   async (data, formData, user): Promise<ActionState> => {
     const t = await getTranslatorForLocale(data.locale, 'myListings');
 
+    const listing = await requireOwnedListing(data.listingId, user.id);
+    if (listing.status !== 'published') {
+      return { error: t('errors.deactivateNotAllowed') };
+    }
+
     try {
       await deactivateListingForOwner(user.id, data.listingId);
     } catch (error) {
@@ -804,6 +809,69 @@ export const deactivateListing = validatedActionWithUser(
 
     return {
       success: t('messages.deactivateSuccess'),
+    };
+  }
+);
+
+const deleteSchema = z.object({
+  locale: z.string().min(2).max(5),
+  listingId: z.coerce.number().int().positive(),
+});
+
+export const deleteListing = validatedActionWithUser(
+  deleteSchema,
+  async (data, formData, user): Promise<ActionState> => {
+    const t = await getTranslatorForLocale(data.locale, 'myListings');
+
+    const listing = await requireOwnedListing(data.listingId, user.id);
+    if (listing.status !== 'draft' && listing.status !== 'inactive') {
+      return { error: t('errors.deleteNotAllowed') };
+    }
+
+    try {
+      await db
+        .delete(listings)
+        .where(and(eq(listings.id, data.listingId), eq(listings.ownerId, user.id)));
+    } catch (error) {
+      console.error('Failed to delete listing', error);
+      return {
+        error: t('errors.delete'),
+      };
+    }
+
+    revalidatePath(`/${data.locale}/my-listings`);
+
+    return {
+      success: t('messages.deleteSuccess'),
+    };
+  }
+);
+
+export const reactivateListing = validatedActionWithUser(
+  deactivateSchema,
+  async (data, formData, user): Promise<ActionState> => {
+    const t = await getTranslatorForLocale(data.locale, 'myListings');
+
+    const listing = await requireOwnedListing(data.listingId, user.id);
+    if (listing.status !== 'inactive') {
+      return { error: t('errors.reactivateNotAllowed') };
+    }
+
+    try {
+      await updateListingStatusAction({
+        listingId: data.listingId,
+        status: 'published',
+        locale: data.locale,
+      });
+    } catch (error) {
+      console.error('Failed to reactivate listing', error);
+      return {
+        error: t('errors.reactivate'),
+      };
+    }
+
+    return {
+      success: t('messages.reactivateSuccess'),
     };
   }
 );
