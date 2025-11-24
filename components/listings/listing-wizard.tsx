@@ -33,6 +33,7 @@ import {
   uploadListingMediaAction,
 } from '@/app/[locale]/(marketing)/my-listings/actions';
 import type { Locale } from '@/lib/i18n/config';
+import type { ListingPlanOption } from '@/lib/listings/plans';
 import { LISTING_STEP_DEFINITIONS, LISTING_STEP_IDS } from '@/lib/listings/step-definitions';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/hooks/use-current-user';
@@ -65,42 +66,6 @@ const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
 const STEP_ORDER: ListingStep[] = [...LISTING_STEP_IDS];
 
-const PAYMENT_PLANS = [
-  {
-    id: 'standard' as const,
-    name: 'Standard',
-    price: 9,
-    cadence: 'per listing',
-    perks: ['7-day runtime', 'Visible in search results', 'Basic insights'],
-    badge: 'Good value',
-  },
-  {
-    id: 'plus' as const,
-    name: 'Plus',
-    price: 19,
-    cadence: 'per listing',
-    perks: [
-      '21-day runtime',
-      'Highlighted ad in feeds',
-      'Advanced stats (impressions, clicks, favorites)',
-    ],
-    badge: 'Popular',
-  },
-  {
-    id: 'premium' as const,
-    name: 'Premium',
-    price: 39,
-    cadence: 'per listing',
-    perks: [
-      '45-day runtime',
-      'Top placement & highlight',
-      'Full funnel stats incl. contact conversions',
-      'Priority support',
-    ],
-    badge: 'Best results',
-  },
-];
-
 const STEP_FIELDS: Record<ListingStep, Array<keyof ListingEditorValues>> = {
   metadata: ['title', 'description', 'propertyType', 'transactionType'],
   details: [
@@ -122,7 +87,7 @@ const STEP_FIELDS: Record<ListingStep, Array<keyof ListingEditorValues>> = {
   ],
   media: [],
   finishing: ['price', 'currency', 'contactEmail', 'contactPhone', 'displayEmail', 'displayPhone'],
-  payment: ['promotionTier'],
+  payment: ['promotionTier', 'priceId', 'durationMultiplier'],
   review: [],
 };
 
@@ -154,10 +119,13 @@ const DEFAULT_VALUES: ListingEditorValues = {
   displayEmail: true,
   displayPhone: true,
   promotionTier: 'standard',
+  priceId: '',
+  durationMultiplier: 1,
 };
 
 interface ListingWizardProps {
   locale: Locale;
+  plans: ListingPlanOption[];
   initialListingId?: number;
   initialStatus?: 'draft' | 'published';
   initialValues?: Partial<ListingEditorValues>;
@@ -198,6 +166,10 @@ function shouldAutosave(step: ListingStep, payload: Record<string, unknown> | nu
     const price = payload.price as number | undefined;
     return typeof price === 'number' && price >= 0;
   }
+  if (step === 'payment') {
+    const priceId = payload.priceId as string | undefined;
+    return Boolean(priceId && priceId.trim().length > 0);
+  }
   return true;
 }
 
@@ -213,6 +185,8 @@ function mergeInitialValues(
     city: initial?.city ?? DEFAULT_VALUES.city,
     postalCode: initial?.postalCode ?? DEFAULT_VALUES.postalCode,
     country: initial?.country ?? DEFAULT_VALUES.country,
+    priceId: initial?.priceId ?? DEFAULT_VALUES.priceId,
+    durationMultiplier: initial?.durationMultiplier ?? DEFAULT_VALUES.durationMultiplier,
   };
 }
 
@@ -258,8 +232,24 @@ function formatSavedAt(timestamp: string | null): string | null {
   }
 }
 
+function formatCurrencyValue(amountMinor: number, currency: string, locale: Locale) {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amountMinor / 100);
+}
+
+function formatDurationLabel(months: number) {
+  if (!Number.isFinite(months)) {
+    return '';
+  }
+  return `${months} month${months === 1 ? '' : 's'}`;
+}
+
 export function ListingWizard({
   locale,
+  plans,
   initialListingId,
   initialStatus = 'draft',
   initialValues,
@@ -288,8 +278,30 @@ export function ListingWizard({
   const { user } = useCurrentUser();
 
   const defaultValues = useMemo(
-    () => mergeInitialValues(initialValues),
-    [initialValues]
+    () => {
+      const merged = mergeInitialValues(initialValues);
+      const fallbackPlan =
+        plans.find((plan) => plan.priceId === merged.priceId) ??
+        plans.find((plan) => plan.tier === merged.promotionTier) ??
+        plans[0];
+
+      if (!merged.priceId && fallbackPlan) {
+        merged.priceId = fallbackPlan.priceId;
+      }
+
+      if (fallbackPlan) {
+        const desiredMultiplier = merged.durationMultiplier ?? 1;
+        merged.durationMultiplier = fallbackPlan.multipliers.includes(desiredMultiplier)
+          ? desiredMultiplier
+          : fallbackPlan.multipliers[0] ?? 1;
+        merged.promotionTier = fallbackPlan.tier;
+      } else {
+        merged.durationMultiplier = merged.durationMultiplier ?? 1;
+      }
+
+      return merged;
+    },
+    [initialValues, plans]
   );
 
   const partialEditorSchema = useMemo(() => listingEditorSchema.partial(), []);
@@ -301,6 +313,13 @@ export function ListingWizard({
   });
 
   const watchedValues = form.watch();
+  const selectedPlan = useMemo(
+    () =>
+      plans.find((plan) => plan.priceId === watchedValues.priceId) ??
+      plans[0] ??
+      null,
+    [plans, watchedValues.priceId]
+  );
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedByStepRef = useRef<Record<ListingStep, string>>({
     metadata: JSON.stringify(getStepPayload('metadata', defaultValues) ?? {}),
@@ -315,6 +334,27 @@ export function ListingWizard({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [isSavingDraft, startDraftTransition] = useTransition();
+
+  useEffect(() => {
+    if (!selectedPlan) {
+      return;
+    }
+
+    if (form.getValues('promotionTier') !== selectedPlan.tier) {
+      form.setValue('promotionTier', selectedPlan.tier, {
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+    }
+
+    const currentMultiplier = Number(form.getValues('durationMultiplier') ?? 1);
+    if (!selectedPlan.multipliers.includes(currentMultiplier)) {
+      form.setValue('durationMultiplier', selectedPlan.multipliers[0] ?? 1, {
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+    }
+  }, [form, selectedPlan]);
 
   useEffect(() => {
     if (user?.email && !form.getValues('contactEmail')) {
@@ -556,18 +596,37 @@ export function ListingWizard({
       setAutoSaveError('Save your listing details first, then return to payment.');
       return;
     }
+    const priceId = form.getValues('priceId');
+    const durationMultiplier = Number(form.getValues('durationMultiplier') ?? 1);
+    if (!priceId) {
+      setAutoSaveState('error');
+      setAutoSaveError('Select a Stripe plan before paying.');
+      return;
+    }
+    if (!selectedPlan) {
+      setAutoSaveState('error');
+      setAutoSaveError('No listing plans are available. Please contact support.');
+      return;
+    }
     startPaymentTransition(async () => {
       try {
         const result = await completeListingPaymentAction({
           listingId,
           locale,
-          promotionTier: form.getValues('promotionTier') ?? 'standard',
+          priceId,
+          durationMultiplier,
         });
         form.setValue('promotionTier', result.promotionTier, {
           shouldDirty: false,
           shouldTouch: false,
         });
+        form.setValue('priceId', priceId, { shouldDirty: false, shouldTouch: false });
+        form.setValue('durationMultiplier', durationMultiplier, {
+          shouldDirty: false,
+          shouldTouch: false,
+        });
         setPaymentStatus(result.paymentStatus);
+        setLastSavedAt(result.paidAt ?? null);
         setAutoSaveState('saved');
         setAutoSaveError(null);
       } catch (error) {
@@ -604,6 +663,17 @@ export function ListingWizard({
   };
 
   const savedAtLabel = formatSavedAt(lastSavedAt);
+  const selectedMultiplier = Number(watchedValues.durationMultiplier ?? 1);
+  const totalRuntimeMonths = selectedPlan
+    ? selectedPlan.baseDurationMonths * selectedMultiplier
+    : null;
+  const totalPriceLabel = selectedPlan
+    ? formatCurrencyValue(
+        selectedPlan.amount * selectedMultiplier,
+        selectedPlan.currency,
+        locale
+      )
+    : null;
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 pb-16">
@@ -1042,14 +1112,14 @@ export function ListingWizard({
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900">Choose a plan</h2>
                   <p className="text-sm text-slate-500">
-                    Publishing an ad requires a paid plan. Pick the tier that matches how much exposure you
-                    want.
+                    Publishing an ad requires a paid plan from Stripe. Pick the tier that matches how much
+                    exposure you want.
                   </p>
                   <p className="mt-2 text-xs text-slate-400">
-                    You can keep saving drafts for free (limit 5), but publishing is unlocked after payment.
+                    Select a plan and runtime; price multiplies with the duration you choose.
                   </p>
                 </div>
-                <div>
+                <div className="text-right">
                   <span
                     className={cn(
                       'inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium',
@@ -1060,60 +1130,150 @@ export function ListingWizard({
                   >
                     {paymentStatus === 'paid' ? 'Payment complete' : 'Payment required before publishing'}
                   </span>
+                  {totalRuntimeMonths ? (
+                    <p className="mt-2 text-xs text-slate-500">
+                      Runtime {formatDurationLabel(totalRuntimeMonths)}
+                      {totalPriceLabel ? ` • ${totalPriceLabel}` : ''}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
-              <div className="mt-6 grid gap-4 md:grid-cols-3">
-                {PAYMENT_PLANS.map((plan) => {
-                  const selected = form.watch('promotionTier') === plan.id;
-                  return (
-                    <button
-                      type="button"
-                      key={plan.id}
-                      onClick={() => form.setValue('promotionTier', plan.id)}
-                      className={cn(
-                        'flex h-full flex-col rounded-2xl border p-4 text-left transition hover:border-slate-300',
-                        selected ? 'border-emerald-500 ring-2 ring-emerald-100' : 'border-slate-200'
-                      )}
-                    >
-                      <div className="flex items-start justify-between">
+              {!plans.length ? (
+                <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                  No Stripe listing prices found. Add one-time prices with listing_tier metadata to continue.
+                </div>
+              ) : (
+                <>
+                  <div className="mt-6 grid gap-4 md:grid-cols-3">
+                    {plans.map((plan) => {
+                      const selected = watchedValues.priceId === plan.priceId;
+                      const basePrice = formatCurrencyValue(
+                        plan.amount,
+                        plan.currency,
+                        locale
+                      );
+                      return (
+                        <button
+                          type="button"
+                          key={plan.priceId}
+                          onClick={() => {
+                            form.setValue('priceId', plan.priceId);
+                            form.setValue('promotionTier', plan.tier, {
+                              shouldDirty: false,
+                              shouldTouch: false,
+                            });
+                            if (
+                              !plan.multipliers.includes(
+                                Number(watchedValues.durationMultiplier ?? 1)
+                              )
+                            ) {
+                              form.setValue('durationMultiplier', plan.multipliers[0] ?? 1, {
+                                shouldDirty: false,
+                                shouldTouch: false,
+                              });
+                            }
+                          }}
+                          className={cn(
+                            'flex h-full flex-col rounded-2xl border p-4 text-left transition hover:border-slate-300',
+                            selected ? 'border-emerald-500 ring-2 ring-emerald-100' : 'border-slate-200'
+                          )}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="text-sm font-semibold text-slate-900">{plan.name}</p>
+                              <p className="text-xs text-slate-500">
+                                {formatDurationLabel(plan.baseDurationMonths)}
+                              </p>
+                            </div>
+                            <div className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium uppercase text-slate-700">
+                              {plan.tier}
+                            </div>
+                          </div>
+                          <p className="mt-3 text-2xl font-semibold text-slate-900">
+                            {basePrice}
+                            <span className="text-xs font-normal text-slate-500">
+                              {' '}
+                              / {formatDurationLabel(plan.baseDurationMonths)}
+                            </span>
+                          </p>
+                          <ul className="mt-3 space-y-2 text-sm text-slate-600">
+                            {(plan.perks.length
+                              ? plan.perks
+                              : [`Includes ${formatDurationLabel(plan.baseDurationMonths)} runtime`]
+                            ).map((perk) => (
+                              <li key={perk} className="flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                <span>{perk}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          <div className="mt-auto pt-4 text-xs text-slate-500">
+                            {selected ? 'Selected' : 'Click to select this plan'}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {selectedPlan ? (
+                    <div className="mt-6 rounded-2xl border border-slate-200 p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">{plan.name}</p>
-                          <p className="text-xs text-slate-500">{plan.cadence}</p>
+                          <h3 className="text-sm font-semibold text-slate-900">
+                            Duration & pricing
+                          </h3>
+                          <p className="text-xs text-slate-500">
+                            Choose how long the listing runs; price multiplies automatically.
+                          </p>
                         </div>
-                        <div className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-700">
-                          {plan.badge}
-                        </div>
+                        {totalPriceLabel ? (
+                          <div className="rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white">
+                            {totalPriceLabel}
+                          </div>
+                        ) : null}
                       </div>
-                      <p className="mt-3 text-2xl font-semibold text-slate-900">
-                        €{plan.price}
-                        <span className="text-xs font-normal text-slate-500"> / listing</span>
-                      </p>
-                      <ul className="mt-3 space-y-2 text-sm text-slate-600">
-                        {plan.perks.map((perk) => (
-                          <li key={perk} className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                            <span>{perk}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="mt-auto pt-4 text-xs text-slate-500">
-                        {selected ? 'Selected' : 'Click to select this plan'}
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {selectedPlan.multipliers.map((multiplier) => {
+                          const runtime = multiplier * selectedPlan.baseDurationMonths;
+                          const priceLabel = formatCurrencyValue(
+                            selectedPlan.amount * multiplier,
+                            selectedPlan.currency,
+                            locale
+                          );
+                          const isSelected = multiplier === selectedMultiplier;
+                          return (
+                            <button
+                              key={`${selectedPlan.priceId}-${multiplier}`}
+                              type="button"
+                              className={cn(
+                                'rounded-full border px-4 py-2 text-sm transition',
+                                isSelected
+                                  ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                  : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                              )}
+                              onClick={() => form.setValue('durationMultiplier', multiplier)}
+                            >
+                              {formatDurationLabel(runtime)} • {priceLabel}
+                            </button>
+                          );
+                        })}
                       </div>
-                    </button>
-                  );
-                })}
-              </div>
+                    </div>
+                  ) : null}
+                </>
+              )}
 
               <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <p className="text-sm text-slate-500">
-                  Payment unlocks publishing for this listing. You can change tiers anytime before payment.
+                  Payment unlocks publishing for this listing. You can change tiers anytime before payment and
+                  renew after expiry.
                 </p>
                 <div className="flex flex-col gap-2 md:flex-row md:items-center">
                   <Button
                     type="button"
                     variant={paymentStatus === 'paid' ? 'outline' : 'default'}
-                    disabled={paymentStatus === 'paid' || isPaying || !listingId}
+                    disabled={paymentStatus === 'paid' || isPaying || !listingId || !plans.length}
                     onClick={() => handleCompletePayment()}
                     className="rounded-full"
                   >
@@ -1127,7 +1287,8 @@ export function ListingWizard({
                   )}
                   {paymentStatus !== 'paid' && (
                     <span className="text-xs text-slate-500 md:ml-3">
-                      You will be redirected to payment; on success we mark this listing as paid.
+                      Prices are loaded from Stripe. On success we mark this listing as paid for the selected
+                      runtime.
                     </span>
                   )}
                 </div>

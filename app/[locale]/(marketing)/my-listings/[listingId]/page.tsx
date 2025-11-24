@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { ListingWizard } from '@/components/listings/listing-wizard';
 import { getListingDetail } from '@/lib/db/listings';
 import { getUser } from '@/lib/db/queries';
+import { getListingPlansFromStripe } from '@/lib/listings/plans';
 import type { ListingEditorValues } from '@/lib/validation/listing';
 import { isLocale } from '@/lib/i18n/config';
 
@@ -39,6 +40,8 @@ function mapDetailToEditorValues(detail: Awaited<ReturnType<typeof getListingDet
     displayEmail: detail.displayEmail ?? true,
     displayPhone: detail.displayPhone ?? true,
     promotionTier: detail.promotionTier ?? 'standard',
+    priceId: '',
+    durationMultiplier: 1,
   };
 }
 
@@ -72,12 +75,18 @@ export default async function EditListingPage({
     redirect(`/${locale}/my-listings`);
   }
 
+  const plans = await getListingPlansFromStripe().catch((error) => {
+    console.error('Failed to load listing plans from Stripe', error);
+    return [];
+  });
+
   const initialValues = mapDetailToEditorValues(listing);
 
   return (
     <main className="px-4 pb-16 pt-8 sm:px-6 lg:px-10">
       <ListingWizard
         locale={locale}
+        plans={plans}
         mode="edit"
         initialListingId={listing.id}
         initialStatus={listing.status === 'published' ? 'published' : 'draft'}

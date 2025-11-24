@@ -30,6 +30,7 @@ import {
 } from '@/lib/db/listings';
 import { validatedActionWithUser, type ActionState } from '@/lib/auth/middleware';
 import type { ListingStatus } from '@/lib/types/listing';
+import { findListingPlan } from '@/lib/listings/plans';
 
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
@@ -101,6 +102,7 @@ async function requireOwnedListing(listingId: number, ownerId: number) {
       postalCode: listings.postalCode,
       status: listings.status,
       paymentStatus: listings.paymentStatus,
+      expiresAt: listings.expiresAt,
     })
     .from(listings)
     .where(eq(listings.id, listingId))
@@ -224,6 +226,12 @@ function mapFinishingToUpdate(parsed: ListingFinishingInput) {
     displayPhone: parsed.displayPhone ?? true,
     updatedAt: new Date(),
   };
+}
+
+function addMonths(date: Date, months: number) {
+  const result = new Date(date.getTime());
+  result.setUTCMonth(result.getUTCMonth() + months);
+  return result;
 }
 
 export async function saveListingDraftAction(
@@ -485,25 +493,47 @@ export async function deleteListingImageAction(params: {
 export async function completeListingPaymentAction(params: {
   listingId: number;
   locale: string;
-  promotionTier: 'standard' | 'plus' | 'premium';
+  priceId: string;
+  durationMultiplier: number;
 }) {
   const user = await requireUser();
   const locale = normalizeLocale(params.locale);
   const listing = await requireOwnedListing(params.listingId, user.id);
 
+  const plan = await findListingPlan(params.priceId);
+  if (!plan) {
+    throw new Error('Selected plan is no longer available. Refresh and try again.');
+  }
+
+  const multiplier = plan.multipliers.includes(params.durationMultiplier)
+    ? params.durationMultiplier
+    : plan.multipliers[0] ?? 1;
+
+  const runtimeMonths = Math.max(1, plan.baseDurationMonths * multiplier);
+  const paidAt = new Date();
+  const expiresAt = addMonths(paidAt, runtimeMonths);
+
   await db
     .update(listings)
     .set({
-      promotionTier: params.promotionTier,
+      promotionTier: plan.tier,
       paymentStatus: 'paid',
-      paidAt: new Date(),
+      paidAt,
+      expiresAt,
       updatedAt: new Date(),
     })
     .where(and(eq(listings.id, params.listingId), eq(listings.ownerId, user.id)));
 
   revalidateListingViews(locale, params.listingId);
 
-  return { listingId: params.listingId, promotionTier: params.promotionTier, paymentStatus: 'paid' as const };
+  return {
+    listingId: params.listingId,
+    promotionTier: plan.tier,
+    paymentStatus: 'paid' as const,
+    paidAt: paidAt.toISOString(),
+    expiresAt: expiresAt.toISOString(),
+    durationMonths: runtimeMonths,
+  };
 }
 
 export async function updateListingStatusAction(params: {
@@ -518,6 +548,10 @@ export async function updateListingStatusAction(params: {
   if (params.status === 'published') {
     if (listing.paymentStatus !== 'paid') {
       throw new Error('Complete payment before publishing this listing.');
+    }
+    const expiresAt = listing.expiresAt ? new Date(listing.expiresAt) : null;
+    if (!expiresAt || expiresAt.getTime() <= Date.now()) {
+      throw new Error('The paid listing period has expired. Renew the plan to publish.');
     }
     if (!listing.title?.trim()) {
       throw new Error('Add a title before publishing the listing');
@@ -855,6 +889,13 @@ export const reactivateListing = validatedActionWithUser(
     const listing = await requireOwnedListing(data.listingId, user.id);
     if (listing.status !== 'inactive') {
       return { error: t('errors.reactivateNotAllowed') };
+    }
+    const expiresAt = listing.expiresAt ? new Date(listing.expiresAt) : null;
+    if (listing.paymentStatus !== 'paid' || !expiresAt || expiresAt.getTime() <= Date.now()) {
+      return {
+        error:
+          'This listing plan has expired. Renew the paid plan in the payment step before reactivating.',
+      };
     }
 
     try {

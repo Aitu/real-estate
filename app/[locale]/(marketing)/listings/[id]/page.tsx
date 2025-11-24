@@ -40,6 +40,14 @@ export async function generateMetadata({
     return {};
   }
 
+  const expiresAt = listing.expiresAt ? new Date(listing.expiresAt).getTime() : null;
+  const isActive =
+    listing.status === 'published' && expiresAt != null && expiresAt > Date.now();
+
+  if (!isActive) {
+    return {};
+  }
+
   const t = getTranslator(locale, messages, 'listingDetail');
   const description = listing.description ?? t('descriptionFallback');
   const trimmedDescription =
@@ -79,6 +87,14 @@ export default async function ListingDetailPage({
   ]);
 
   if (!listing) {
+    notFound();
+  }
+
+  const expiresAt = listing.expiresAt ? new Date(listing.expiresAt).getTime() : null;
+  const isActive =
+    listing.status === 'published' && expiresAt != null && expiresAt > Date.now();
+
+  if (!isActive) {
     notFound();
   }
 

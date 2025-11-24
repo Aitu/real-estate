@@ -58,6 +58,8 @@ export interface ListingDetail {
   status: string;
   promotionTier?: ListingPlanTier;
   paymentStatus?: ListingPaymentStatus;
+  paidAt?: string | null;
+  expiresAt?: string | null;
   price: number;
   currency: string;
   bedrooms: number | null;
@@ -136,6 +138,8 @@ export interface OwnerListing {
   displayPhone?: boolean;
   promotionTier?: ListingPlanTier;
   paymentStatus?: ListingPaymentStatus;
+  paidAt?: string | null;
+  expiresAt?: string | null;
   viewsCount?: number;
   contactsCount?: number;
   favoritesCount?: number;

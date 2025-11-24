@@ -101,6 +101,11 @@ export default async function MyListingsPage({
       reactivate: t('table.actions.reactivate'),
       reactivatePending: t('table.actions.reactivatePending'),
       confirmReactivate: t('table.actions.confirmReactivate'),
+      remaining: {
+        expiresIn: t('table.remaining.expiresIn'),
+        expired: t('table.remaining.expired'),
+        none: t('table.remaining.none'),
+      },
       noResults: t('table.noResults'),
     },
     statusLabels,

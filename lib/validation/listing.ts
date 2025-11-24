@@ -126,6 +126,8 @@ const promotionTierSchema = z.enum(['standard', 'plus', 'premium']);
 
 export const listingPaymentSchema = z.object({
   promotionTier: promotionTierSchema.default('standard'),
+  priceId: z.string().min(3, 'Price is required'),
+  durationMultiplier: z.coerce.number().int().min(1).max(12).default(1),
 });
 
 export const listingEditorSchema = listingMetadataSchema

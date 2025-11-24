@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, ne, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, isNotNull, ne, sql } from 'drizzle-orm';
 import { db } from './drizzle';
 import { favorites, listings } from './schema';
 import type { ListingDetail } from '@/lib/types/listing';
@@ -95,8 +95,10 @@ function mapListingRecord(record: ListingWithRelations): ListingDetail {
       : null,
     promotionTier: record.promotionTier ?? 'standard',
     paymentStatus: record.paymentStatus ?? 'unpaid',
-  displayEmail: record.displayEmail ?? true,
-  displayPhone: record.displayPhone ?? true,
+    paidAt: toIsoString(record.paidAt),
+    expiresAt: toIsoString(record.expiresAt),
+    displayEmail: record.displayEmail ?? true,
+    displayPhone: record.displayPhone ?? true,
   viewsCount: record.viewsCount ?? 0,
   contactsCount: record.contactsCount ?? 0,
     publishedAt: toIsoString(record.publishedAt),
@@ -158,7 +160,12 @@ export async function incrementListingView(
   listingId: number,
   viewerId?: number
 ): Promise<void> {
-  const conditions = [eq(listings.id, listingId), eq(listings.status, 'published')];
+  const conditions = [
+    eq(listings.id, listingId),
+    eq(listings.status, 'published'),
+    isNotNull(listings.expiresAt),
+    gt(listings.expiresAt, new Date()),
+  ];
   if (viewerId) {
     conditions.push(ne(listings.ownerId, viewerId));
   }
@@ -173,7 +180,12 @@ export async function incrementListingContact(
   listingId: number,
   viewerId?: number
 ): Promise<void> {
-  const conditions = [eq(listings.id, listingId), eq(listings.status, 'published')];
+  const conditions = [
+    eq(listings.id, listingId),
+    eq(listings.status, 'published'),
+    isNotNull(listings.expiresAt),
+    gt(listings.expiresAt, new Date()),
+  ];
   if (viewerId) {
     conditions.push(ne(listings.ownerId, viewerId));
   }
@@ -316,6 +328,7 @@ export async function getListingsForOwner(
         paymentStatus: true,
         paidAt: true,
         publishedAt: true,
+        expiresAt: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -357,6 +370,8 @@ export async function getListingsForOwner(
     displayPhone: record.displayPhone ?? true,
     promotionTier: record.promotionTier ?? 'standard',
     paymentStatus: record.paymentStatus ?? 'unpaid',
+    paidAt: record.paidAt ? record.paidAt.toISOString() : null,
+    expiresAt: record.expiresAt ? record.expiresAt.toISOString() : null,
     viewsCount: record.viewsCount ?? 0,
     contactsCount: record.contactsCount ?? 0,
     favoritesCount: (record as any).favoritesCount ?? 0,
@@ -454,6 +469,8 @@ export async function createListingForOwner(
     displayPhone: created.displayPhone ?? true,
     promotionTier: created.promotionTier ?? 'standard',
     paymentStatus: created.paymentStatus ?? 'unpaid',
+    paidAt: created.paidAt ? created.paidAt.toISOString() : null,
+    expiresAt: created.expiresAt ? created.expiresAt.toISOString() : null,
     publishedAt: created.publishedAt
       ? created.publishedAt.toISOString()
       : null,
@@ -542,6 +559,8 @@ export async function updateListingForOwner(
     displayPhone: updated.displayPhone ?? true,
     promotionTier: updated.promotionTier ?? 'standard',
     paymentStatus: updated.paymentStatus ?? 'unpaid',
+    paidAt: updated.paidAt ? updated.paidAt.toISOString() : null,
+    expiresAt: updated.expiresAt ? updated.expiresAt.toISOString() : null,
     publishedAt: updated.publishedAt
       ? updated.publishedAt.toISOString()
       : null,

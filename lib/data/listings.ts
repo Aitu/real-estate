@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, gt, isNotNull } from 'drizzle-orm';
 import { db } from '@/lib/db/drizzle';
 import { listings, listingImages, propertyFeatures } from '@/lib/db/schema';
 import { mockListings } from '@/lib/mock/listings';
@@ -72,7 +72,11 @@ function toListingSummary(record: ListingSummaryRecord): ListingSummary {
 
 async function getPublishedListingSummaries(limit = mockListings.length): Promise<ListingSummary[]> {
   const records = await db.query.listings.findMany({
-    where: eq(listings.status, 'published'),
+    where: and(
+      eq(listings.status, 'published'),
+      isNotNull(listings.expiresAt),
+      gt(listings.expiresAt, new Date())
+    ),
     orderBy: (fields, operators) => [
       operators.desc(fields.publishedAt),
       operators.desc(fields.createdAt),

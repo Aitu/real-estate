@@ -365,6 +365,11 @@
         "favorites": "Favoriten",
         "contacts": "Kontakte",
         "notAvailable": "k. A."
+      },
+      "remaining": {
+        "expiresIn": "{time} übrig",
+        "expired": "Abgelaufen",
+        "none": "Nicht festgelegt"
       }
     },
     "pagination": {

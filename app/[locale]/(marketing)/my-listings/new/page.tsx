@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 
 import { ListingWizard } from '@/components/listings/listing-wizard';
 import { getUser } from '@/lib/db/queries';
+import { getListingPlansFromStripe } from '@/lib/listings/plans';
 import { isLocale } from '@/lib/i18n/config';
 
 export default async function NewListingPage({
@@ -20,9 +21,14 @@ export default async function NewListingPage({
     redirect(`/sign-in?redirect=/${locale}/my-listings/new`);
   }
 
+  const plans = await getListingPlansFromStripe().catch((error) => {
+    console.error('Failed to load listing plans from Stripe', error);
+    return [];
+  });
+
   return (
     <main className="px-4 pb-16 pt-8 sm:px-6 lg:px-10">
-      <ListingWizard locale={locale} mode="create" initialStatus="draft" />
+      <ListingWizard locale={locale} mode="create" initialStatus="draft" plans={plans} />
     </main>
   );
 }

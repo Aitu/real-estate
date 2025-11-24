@@ -48,6 +48,11 @@ export type MyListingsCopy = {
     reactivate: string;
     reactivatePending: string;
     confirmReactivate: string;
+    remaining: {
+      expiresIn: string;
+      expired: string;
+      none: string;
+    };
     noResults: string;
   };
   statusLabels: Record<ListingStatus, string>;
@@ -94,6 +99,27 @@ function formatDate(locale: string, value: string) {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(date);
+}
+
+function formatRemaining(expiresAt: string | null | undefined, copy: MyListingsCopy['table']['remaining']) {
+  if (!expiresAt) {
+    return copy.none;
+  }
+  const expires = new Date(expiresAt).getTime();
+  const now = Date.now();
+  if (Number.isNaN(expires)) {
+    return copy.none;
+  }
+  if (expires <= now) {
+    return copy.expired;
+  }
+  const diffMs = expires - now;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  if (diffDays <= 0) {
+    return copy.expiresIn.replace('{time}', `${diffHours}h`);
+  }
+  return copy.expiresIn.replace('{time}', `${diffDays}d ${diffHours}h`);
 }
 
 function replaceSummary(template: string, values: Record<string, number>) {
@@ -409,6 +435,10 @@ export function MyListingsManager({
                 const isPublished = listing.status === 'published';
                 const isInactive = listing.status === 'inactive';
                 const canDelete = listing.status === 'draft' || isInactive;
+                const remainingLabel =
+                  isPublished && !isInactive
+                    ? formatRemaining(listing.expiresAt, copy.table.remaining)
+                    : null;
                 return (
                   <tr key={listing.id}>
                     <td className="px-4 py-4 align-top">
@@ -425,9 +455,14 @@ export function MyListingsManager({
                       </div>
                     </td>
                     <td className="px-4 py-4 align-top">
-                      <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${badgeClass}`}>
-                        {statusLabel}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${badgeClass}`}>
+                          {statusLabel}
+                        </span>
+                        {remainingLabel ? (
+                          <span className="text-[11px] text-slate-500">{remainingLabel}</span>
+                        ) : null}
+                      </div>
                     </td>
                     <td className="px-4 py-4 align-top text-sm font-medium text-slate-900">
                       {formatCurrency(locale, listing.currency, listing.price)}

@@ -425,6 +425,11 @@
         "favorites": "favorites",
         "contacts": "contacts",
         "notAvailable": "N/A"
+      },
+      "remaining": {
+        "expiresIn": "{time} left",
+        "expired": "Expired",
+        "none": "Not set"
       }
     },
     "pagination": {
