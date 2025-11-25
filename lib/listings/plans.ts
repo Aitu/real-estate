@@ -11,6 +11,9 @@ export type ListingPlanOption = {
   baseDurationMonths: number;
   multipliers: number[];
   perks: string[];
+  compareAtCents?: number | null;
+  saleBadge?: string | null;
+  saleNote?: string | null;
 };
 
 const MULTIPLIER_METADATA_KEY = 'listing_duration_multipliers';
@@ -18,6 +21,9 @@ const TIER_METADATA_KEY = 'listing_tier';
 const DURATION_METADATA_KEY = 'listing_duration_months';
 const PERKS_METADATA_KEY = 'listing_perks';
 const DEFAULT_MULTIPLIERS = [1, 2, 3];
+const COMPARE_AT_KEY = 'listing_compare_at_cents';
+const SALE_BADGE_KEY = 'sale_badge';
+const SALE_NOTE_KEY = 'sale_note';
 
 function parseMultipliers(metadataValue?: string | null): number[] {
   if (!metadataValue) {
@@ -115,6 +121,13 @@ function mapPriceToPlan(price: Stripe.Price): ListingPlanOption | null {
       price.metadata?.[PERKS_METADATA_KEY] ??
         product.metadata?.[PERKS_METADATA_KEY]
     ),
+    compareAtCents: price.metadata?.[COMPARE_AT_KEY]
+      ? Number(price.metadata[COMPARE_AT_KEY])
+      : product.metadata?.[COMPARE_AT_KEY]
+        ? Number(product.metadata[COMPARE_AT_KEY])
+        : null,
+    saleBadge: price.metadata?.[SALE_BADGE_KEY] ?? product.metadata?.[SALE_BADGE_KEY] ?? null,
+    saleNote: price.metadata?.[SALE_NOTE_KEY] ?? product.metadata?.[SALE_NOTE_KEY] ?? null,
   };
 }
 

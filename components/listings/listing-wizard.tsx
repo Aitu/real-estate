@@ -1148,11 +1148,18 @@ export function ListingWizard({
                   <div className="mt-6 grid gap-4 md:grid-cols-3">
                     {plans.map((plan) => {
                       const selected = watchedValues.priceId === plan.priceId;
-                      const basePrice = formatCurrencyValue(
-                        plan.amount,
-                        plan.currency,
-                        locale
-                      );
+                      const compareAt = plan.compareAtCents ?? null;
+                      const isOnSale = compareAt != null && compareAt > plan.amount;
+                      const basePrice = formatCurrencyValue(plan.amount, plan.currency, locale);
+                      const compareAtPrice = compareAt
+                        ? formatCurrencyValue(compareAt, plan.currency, locale)
+                        : null;
+                      const savings =
+                        compareAt && compareAt > plan.amount ? compareAt - plan.amount : null;
+                      const savingsLabel =
+                        savings && savings > 0
+                          ? `Save ${formatCurrencyValue(savings, plan.currency, locale)}`
+                          : null;
                       return (
                         <button
                           type="button"
@@ -1179,24 +1186,46 @@ export function ListingWizard({
                             selected ? 'border-emerald-500 ring-2 ring-emerald-100' : 'border-slate-200'
                           )}
                         >
-                          <div className="flex items-start justify-between">
+                          <div className="flex items-start justify-between gap-2">
                             <div>
                               <p className="text-sm font-semibold text-slate-900">{plan.name}</p>
                               <p className="text-xs text-slate-500">
                                 {formatDurationLabel(plan.baseDurationMonths)}
                               </p>
                             </div>
-                            <div className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium uppercase text-slate-700">
-                              {plan.tier}
+                            <div className="flex flex-col items-end gap-1">
+                              <div className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium uppercase text-slate-700">
+                                {plan.tier}
+                              </div>
+                              {isOnSale && (plan.saleBadge || compareAtPrice) ? (
+                                <div className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-700 animate-[pulse_1.5s_ease-in-out_infinite]">
+                                  {plan.saleBadge ?? 'Sale'}
+                                </div>
+                              ) : null}
                             </div>
                           </div>
-                          <p className="mt-3 text-2xl font-semibold text-slate-900">
-                            {basePrice}
-                            <span className="text-xs font-normal text-slate-500">
-                              {' '}
-                              / {formatDurationLabel(plan.baseDurationMonths)}
-                            </span>
-                          </p>
+                          <div className="mt-3 flex items-baseline gap-2">
+                            {isOnSale && compareAtPrice ? (
+                              <span className="relative text-sm text-slate-400 line-through">
+                                {compareAtPrice}
+                              </span>
+                            ) : null}
+                            <p className="text-2xl font-semibold text-slate-900">
+                              {basePrice}
+                              <span className="text-xs font-normal text-slate-500">
+                                {' '}
+                                / {formatDurationLabel(plan.baseDurationMonths)}
+                              </span>
+                            </p>
+                          </div>
+                          {savingsLabel ? (
+                            <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-700">
+                              {savingsLabel}
+                            </div>
+                          ) : null}
+                          {isOnSale && plan.saleNote ? (
+                            <p className="mt-1 text-[11px] text-amber-700">{plan.saleNote}</p>
+                          ) : null}
                           <ul className="mt-3 space-y-2 text-sm text-slate-600">
                             {(plan.perks.length
                               ? plan.perks
