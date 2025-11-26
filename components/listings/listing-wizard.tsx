@@ -1108,16 +1108,10 @@ export function ListingWizard({
 
           {currentStep === 'payment' && (
             <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900">Choose a plan</h2>
-                  <p className="text-sm text-slate-500">
-                    Publishing an ad requires a paid plan from Stripe. Pick the tier that matches how much
-                    exposure you want.
-                  </p>
-                  <p className="mt-2 text-xs text-slate-400">
-                    Select a plan and runtime; price multiplies with the duration you choose.
-                  </p>
+                  <p className="text-sm text-slate-500">Pick a tier and runtime to publish.</p>
                 </div>
                 <div className="text-right">
                   <span
@@ -1128,14 +1122,8 @@ export function ListingWizard({
                         : 'bg-orange-50 text-orange-700'
                     )}
                   >
-                    {paymentStatus === 'paid' ? 'Payment complete' : 'Payment required before publishing'}
+                    {paymentStatus === 'paid' ? 'Payment complete' : 'Payment required'}
                   </span>
-                  {totalRuntimeMonths ? (
-                    <p className="mt-2 text-xs text-slate-500">
-                      Runtime {formatDurationLabel(totalRuntimeMonths)}
-                      {totalPriceLabel ? ` • ${totalPriceLabel}` : ''}
-                    </p>
-                  ) : null}
                 </div>
               </div>
 
